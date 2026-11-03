@@ -1,0 +1,18 @@
+{
+  "id": "REPLACE_ME",
+  "name": "REPLACE_ME (exact dataset name from the archive)",
+  "authoritative_source": "REPLACE_ME",
+  "access_url": null,
+  "format": "Esri ASCII Grid (converted from REPLACE_ME)",
+  "crs": "REPLACE_ME (must be geographic, degrees)",
+  "coverage": "REPLACE_ME",
+  "resolution": "REPLACE_ME",
+  "units": "metres",
+  "license": null,
+  "storage_estimate_mb": null,
+  "processing_steps": ["REPLACE_ME"],
+  "limitations": ["REPLACE_ME"],
+  "status": "unverified",
+  "verified_on": null,
+  "terrain_file": "region.asc"
+}

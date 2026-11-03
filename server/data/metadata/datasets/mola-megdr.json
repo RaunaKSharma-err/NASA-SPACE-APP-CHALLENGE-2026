@@ -1,0 +1,32 @@
+{
+  "id": "mola-megdr",
+  "name": "MOLA Mission Experiment Gridded Data Record (MEGDR)",
+  "authoritative_source": "NASA/GSFC/MOLA Team — USGS Astrogeology Science Center",
+  "access_url": "https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg128/megt00n090hb.img",
+  "format": "PDS3 binary (MSB_INTEGER, 16-bit) — converted to Esri ASCII Grid (.asc) via extraction script",
+  "crs": "Simple cylindrical (planetocentric), IAU 2000, -180 to 180 longitude, -90 to 90 latitude, Mars radius 3396.0 km",
+  "coverage": "Gale Crater region: lon 137.0-138.0, lat -5.5 to -4.5 (extracted from global tile MEGT00N090HB covering lon 90-180, lat -44 to 0)",
+  "resolution": "128 pixels/degree, ~463 m/pixel at equator (native MOLA resolution)",
+  "units": "metres (elevation above areoid, i.e. planetary radius minus areoid radius)",
+  "license": "CC0 / public domain (NASA PDS)",
+  "storage_estimate_mb": 0.08,
+  "processing_steps": [
+    "Downloaded PDS tile MEGT00N090HB from https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg128/megt00n090hb.img (123 MB, 5632x11520, 16-bit big-endian)",
+    "Verified file size: 129761280 bytes = 5632 * 11520 * 2",
+    "Extracted 128x128 sub-grid for Gale Crater (cols 6016-6144, rows 576-704)",
+    "Converted to Esri ASCII Grid (.asc) with cellsize 1/128 degree",
+    "NoData value set to -9999 (no explicit NoData in MOLA; all cells have interpolated values)",
+    "Stored at data/processed/gale-crater/region.asc"
+  ],
+  "limitations": [
+    "Polar gaps above 87N and below 87S are sparse (few off-nadir tracks, interpolated)",
+    "Elevation uncertainty at least ±3 m due to areoid error (±1.8 m) and regional uncertainties",
+    "Horizontal positional accuracy originally ~100 m",
+    "463 m resolution is coarse for rover-scale pathfinding; sub-kilometre features are not resolved",
+    "Slope computed from 463 m cells overestimates fine-scale roughness and underestimates steep short slopes",
+    "Gaps in source data were filled by interpolation — no explicit NoData cells in this extract"
+  ],
+  "status": "verified",
+  "verified_on": "2026-11-02",
+  "terrain_file": "region.asc"
+}

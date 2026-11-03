@@ -1,0 +1,117 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-primary: #080B10;
+    --bg-secondary: #101720;
+    --bg-tertiary: #151F2A;
+    --border-subtle: #1E2935;
+    --border-accent: rgba(53, 217, 242, 0.2);
+    --text-primary: #F1F5F9;
+    --text-secondary: #B8C4D3;
+    --text-muted: #8D9CAF;
+    --accent: #35D9F2;
+  }
+
+  body {
+    @apply bg-[#080B10] text-[#F1F5F9] font-sans antialiased;
+    overflow: hidden;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(53, 217, 242, 0.2) transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: rgba(53, 217, 242, 0.2);
+    border-radius: 3px;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: rgba(53, 217, 242, 0.4);
+  }
+
+  *:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  input:focus-visible,
+  button:focus-visible,
+  [role="button"]:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply bg-[rgba(16,23,32,0.82)] backdrop-blur-md border border-[#344252]/60 rounded-lg;
+  }
+
+  .glass-panel-accent {
+    @apply bg-[rgba(16,23,32,0.82)] backdrop-blur-md border border-accent-500/20 rounded-lg;
+  }
+
+  .data-value {
+    @apply font-mono text-sm text-[#F1F5F9] tabular-nums;
+  }
+
+  .data-label {
+    @apply font-mono text-[11px] text-[#8D9CAF] uppercase tracking-wider;
+  }
+
+  .section-title {
+    @apply text-[11px] font-medium uppercase tracking-widest text-[#B8C4D3];
+  }
+
+  .accent-text {
+    @apply text-accent-400;
+  }
+
+  .mission-dot {
+    @apply inline-block w-2 h-2 rounded-full;
+  }
+}
+
+@layer utilities {
+  .text-glow {
+    text-shadow: 0 0 8px rgba(53, 217, 242, 0.4);
+  }
+
+  .border-glow {
+    box-shadow: 0 0 12px rgba(53, 217, 242, 0.1), inset 0 0 12px rgba(53, 217, 242, 0.05);
+  }
+
+  .grid-bg {
+    background-image:
+      linear-gradient(rgba(53, 217, 242, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(53, 217, 242, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+}

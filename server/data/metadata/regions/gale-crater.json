@@ -1,0 +1,9 @@
+{
+  "id": "gale-crater",
+  "name": "Gale Crater",
+  "bbox": [137.0, -5.5, 138.0, -4.5],
+  "description": "Gale Crater — MSL Curiosity landing site. 154-km diameter impact crater containing Aeolis Mons (Mount Sharp), a ~5 km high layered sedimentary mound. Terrain elevation from MOLA MEGDR (128 px/degree, ~463 m/pixel). Crater floor elevation approximately -4500 m; rim approximately -1000 to 0 m; central mound rises to approximately -4000 m (approximately +500 m above crater floor). Real MOLA elevation data extracted from PDS tile MEGT00N090HB.",
+  "layer_ids": ["mola-megdr"],
+  "terrain_dataset_id": "mola-megdr",
+  "status": "verified"
+}
