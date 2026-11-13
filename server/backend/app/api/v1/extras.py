@@ -39,11 +39,21 @@ def observations(region_id: str):
 @router.post("/assistant/query", response_model=AssistantResponse)
 def assistant(req: AssistantQuery):
     s = get_settings()
-    docs = [Document(d.id, d.name,
-                     f"Status: {d.status}. Source: {d.authoritative_source}. Coverage: {d.coverage}. "
-                     f"Format: {d.format}. Limitations: {'; '.join(d.limitations) or 'none recorded'}.",
-                     "dataset_metadata")
-            for d in load_models(s.metadata_dir / "datasets", DatasetProvenance)]
+    dataset_docs = [
+        Document(d.id, d.name,
+                 f"Status: {d.status}. Source: {d.authoritative_source}. Coverage: {d.coverage}. "
+                 f"Format: {d.format}. Limitations: {'; '.join(d.limitations) or 'none recorded'}.",
+                 "dataset_metadata")
+        for d in load_models(s.metadata_dir / "datasets", DatasetProvenance)
+    ]
+    region_docs = [
+        Document(r.id, r.name,
+                 f"Region: {r.description}. BBox: [{', '.join(str(x) for x in r.bbox)}]. "
+                 f"Terrain dataset: {r.terrain_dataset_id or 'none'}. Status: {r.status}.",
+                 "region_metadata")
+        for r in load_models(s.metadata_dir / "regions", Region)
+    ]
+    docs = dataset_docs + region_docs
     r = answer_query(req.query, docs, get_provider(s.ai_provider))
     return AssistantResponse(status=r.status, answer=r.answer, notes=r.notes,
                              evidence=[EvidenceOut(**e.__dict__) for e in r.evidence])

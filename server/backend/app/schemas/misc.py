@@ -1,10 +1,16 @@
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class AssistantQuery(BaseModel):
-    query: str = Field(min_length=3, max_length=500)
+    query: str = Field(min_length=1, max_length=500)
+
+    @model_validator(mode="after")
+    def _reject_whitespace_only(self) -> "AssistantQuery":
+        if not self.query.strip():
+            raise ValueError("query must not be empty or whitespace-only")
+        return self
 
 
 class EvidenceOut(BaseModel):

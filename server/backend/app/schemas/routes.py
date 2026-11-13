@@ -12,6 +12,8 @@ class RoutePlanRequest(BaseModel):
     target: Coordinate
     max_slope_deg: float = Field(default=25.0, gt=0, le=90)
     slope_weight: float = Field(default=4.0, ge=0, le=100)
+    elevation_weight: float = Field(default=0.5, ge=0, le=100)
+    hazard_weight: float = Field(default=10.0, ge=0, le=1000)
 
 
 class RoutePlanResponse(BaseModel):
@@ -20,9 +22,17 @@ class RoutePlanResponse(BaseModel):
     coordinates: list[Coordinate]
     horizontal_distance_m: float
     surface_distance_m: float
+    straight_line_distance_m: float
+    distance_ratio: float
     total_cost: float
     max_slope_deg: float
     mean_slope_deg: float
+    elevation_gain_m: float
+    elevation_loss_m: float
+    max_elevation_m: float | None = None
+    min_elevation_m: float | None = None
+    high_slope_segments: int
+    no_data_cells_encountered: int
     hazards_evaluated: list[str]
     assumptions: list[str]
     warnings: list[str]

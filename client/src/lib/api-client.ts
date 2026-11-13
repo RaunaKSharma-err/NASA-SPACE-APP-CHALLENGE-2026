@@ -49,11 +49,23 @@ function backendToRouteResult(resp: BackendRouteResponse, id: string): RouteResu
     estimatedTime: Math.round(resp.horizontal_distance_m / 150 / 60),
     maxSlope: resp.max_slope_deg,
     avgSlope: resp.mean_slope_deg,
-    hazardCount: 0,
+    hazardCount: resp.no_data_cells_encountered + resp.high_slope_segments,
     hazardLevel: resp.max_slope_deg > 30 ? 'high' : resp.max_slope_deg > 15 ? 'moderate' : 'low',
     waypoints,
     confidence: 0.85,
     reasoning: resp.warnings.join(' '),
+    straightLineDistanceM: resp.straight_line_distance_m,
+    distanceRatio: resp.distance_ratio,
+    elevationGainM: resp.elevation_gain_m,
+    elevationLossM: resp.elevation_loss_m,
+    maxElevationM: resp.max_elevation_m,
+    minElevationM: resp.min_elevation_m,
+    highSlopeSegments: resp.high_slope_segments,
+    noDataCellsEncountered: resp.no_data_cells_encountered,
+    terrainCoverage: resp.terrain_status,
+    hazardsEvaluated: resp.hazards_evaluated,
+    assumptions: resp.assumptions,
+    warnings: resp.warnings,
   };
 }
 
@@ -70,6 +82,7 @@ function backendToAssistantMessage(resp: BackendAssistantResponse): AssistantMes
     evidence,
     sources: resp.evidence.map((e) => e.title),
     uncertainty: resp.status === 'ok' ? 'low' : resp.status === 'provider_unavailable' ? 'high' : 'medium',
+    provider: 'live',
   };
 }
 
@@ -218,6 +231,8 @@ export const apiClient = {
           target: { lon: request.endLon, lat: request.endLat },
           max_slope_deg: request.maxSlope,
           slope_weight: 4,
+          elevation_weight: request.elevationWeight ?? 0.5,
+          hazard_weight: request.hazardWeight ?? 10,
         }) },
         10000
       );
@@ -241,10 +256,16 @@ export const apiClient = {
         { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query: request.query }) },
         15000
       );
-      if (!response.ok) throw new Error('Assistant query failed');
+      if (!response.ok) throw new Error(`Backend error: HTTP ${response.status}`);
       const data: BackendAssistantResponse = await response.json();
       return backendToAssistantMessage(data);
-    } catch {
+    } catch (err) {
+      const isNetworkError = err instanceof TypeError || (err instanceof Error && (
+        err.message.includes('Failed to fetch') ||
+        err.message.includes('NetworkError') ||
+        err.message.includes('abort') ||
+        err.name === 'AbortError'
+      ));
       const result = await queryAssistant(request.query, request.regionId);
       return {
         id: `msg-${Date.now()}`,
@@ -254,6 +275,8 @@ export const apiClient = {
         evidence: result.evidence,
         sources: result.sources,
         uncertainty: result.uncertainty,
+        provider: 'mock',
+        error: isNetworkError,
       };
     }
   },
@@ -278,6 +301,249 @@ export const apiClient = {
       return await response.json();
     } catch {
       return { simulated: true, connected: false, pending: 0, last_synchronized: null };
+    }
+  },
+
+  // ------------------------------------------------------------------ provider API
+
+  async checkProviderHealth(): Promise<{
+    localEnabled: boolean;
+    remoteEnabled: boolean;
+    remoteConfigured: boolean;
+    sourceMode: string;
+    providers: Array<{
+      id: string;
+      type: string;
+      enabled: boolean;
+      priority: number;
+      capabilities: string[];
+      requiresAuth: boolean;
+    }>;
+  }> {
+    try {
+      const response = await fetchWithTimeout(`${this.baseUrl}/providers/health`);
+      if (!response.ok) throw new Error(`Provider health check failed: ${response.status}`);
+      return await response.json();
+    } catch {
+      return {
+        localEnabled: true,
+        remoteEnabled: false,
+        remoteConfigured: false,
+        sourceMode: "local",
+        providers: [],
+      };
+    }
+  },
+
+  async setSourceMode(mode: "local" | "remote" | "remote_with_fallback"): Promise<{
+    mode: string;
+    remoteEnabled: boolean;
+    remoteConfigured: boolean;
+  }> {
+    try {
+      const response = await fetchWithTimeout(
+        `${this.baseUrl}/providers/source-mode`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ mode }),
+        }
+      );
+      if (!response.ok) throw new Error(`Set source mode failed: ${response.status}`);
+      return await response.json();
+    } catch {
+      return { mode: "local", remoteEnabled: false, remoteConfigured: false };
+    }
+  },
+
+  async listProviderDatasets(regionId?: string, type?: string): Promise<{
+    datasets: Array<{
+      id: string;
+      name: string;
+      type: string;
+      source: string;
+      format: string;
+      crsName: string;
+      crsUnits: string;
+      lonMin: number;
+      lonMax: number;
+      latMin: number;
+      latMax: number;
+      valueUnit: string;
+      organization: string;
+      datasetTitle: string;
+      sourceUrl?: string;
+      accessUrl?: string;
+      status: string;
+    }>;
+    source: string;
+    mode: string;
+    providerUsed?: string;
+    fallbackReason?: string;
+  }> {
+    try {
+      const url = new URL(`${this.baseUrl}/providers/datasets`);
+      if (regionId) url.searchParams.set("region_id", regionId);
+      if (type) url.searchParams.set("dtype", type);
+      const response = await fetchWithTimeout(url.toString());
+      if (!response.ok) throw new Error(`List datasets failed: ${response.status}`);
+      return await response.json();
+    } catch {
+      return {
+        datasets: [],
+        source: "fallback",
+        mode: "local",
+      };
+    }
+  },
+
+  async getProviderDataset(datasetId: string): Promise<{
+    id: string;
+    name: string;
+    type: string;
+    source: string;
+    format: string;
+    crsName: string;
+    crsUnits: string;
+    lonMin: number;
+    lonMax: number;
+    latMin: number;
+    latMax: number;
+    valueUnit: string;
+    organization: string;
+    datasetTitle: string;
+    sourceUrl?: string;
+    accessUrl?: string;
+    status: string;
+  } | null> {
+    try {
+      const response = await fetchWithTimeout(`${this.baseUrl}/providers/datasets/${encodeURIComponent(datasetId)}`);
+      if (!response.ok) throw new Error(`Get dataset failed: ${response.status}`);
+      return await response.json();
+    } catch {
+      return null;
+    }
+  },
+
+  async sampleProviderElevation(datasetId: string, lat: number, lon: number): Promise<{
+    sample: {
+      id: string;
+      datasetId: string;
+      lat: number;
+      lon: number;
+      value: number | null;
+      valid: boolean;
+      units: string;
+      nodata: boolean;
+      crsName: string;
+      crsUnits: string;
+    };
+    source: string;
+    mode: string;
+    providerUsed?: string;
+    fallbackReason?: string;
+  }> {
+    try {
+      const url = new URL(`${this.baseUrl}/providers/elevation`);
+      url.searchParams.set("dataset_id", datasetId);
+      url.searchParams.set("lat", String(lat));
+      url.searchParams.set("lon", String(lon));
+      const response = await fetchWithTimeout(url.toString());
+      if (!response.ok) throw new Error(`Elevation sample failed: ${response.status}`);
+      return await response.json();
+    } catch {
+      return {
+        sample: {
+          id: "none",
+          datasetId,
+          lat,
+          lon,
+          value: null,
+          valid: false,
+          units: "metres",
+          nodata: true,
+          crsName: "Simple cylindrical (planetocentric)",
+          crsUnits: "degrees",
+        },
+        source: "fallback",
+        mode: "local",
+      };
+    }
+  },
+
+  async getProviderImagery(datasetId: string, latMin: number, latMax: number, lonMin: number, lonMax: number): Promise<{
+    imagery: Array<{
+      id: string;
+      datasetId: string;
+      bounds: Record<string, unknown>;
+      url?: string;
+      format: string;
+      attribution: Record<string, unknown>;
+    }>;
+    source: string;
+    mode: string;
+    providerUsed?: string;
+    fallbackReason?: string;
+  }> {
+    try {
+      const url = new URL(`${this.baseUrl}/providers/imagery`);
+      url.searchParams.set("dataset_id", datasetId);
+      url.searchParams.set("lat_min", String(latMin));
+      url.searchParams.set("lat_max", String(latMax));
+      url.searchParams.set("lon_min", String(lonMin));
+      url.searchParams.set("lon_max", String(lonMax));
+      const response = await fetchWithTimeout(url.toString());
+      if (!response.ok) throw new Error(`Imagery request failed: ${response.status}`);
+      return await response.json();
+    } catch {
+      return {
+        imagery: [],
+        source: "fallback",
+        mode: "local",
+      };
+    }
+  },
+
+  async validateProviderResource(dataset: {
+    id: string;
+    name: string;
+    type: string;
+    source: string;
+    format: string;
+    crsName: string;
+    crsUnits: string;
+    lonMin: number;
+    lonMax: number;
+    latMin: number;
+    latMax: number;
+    valueUnit: string;
+    organization: string;
+    datasetTitle: string;
+    status: string;
+  }): Promise<{
+    valid: boolean;
+    errors: string[];
+    warnings: string[];
+    checks: Record<string, { passed: boolean; message: string; detail?: unknown }>;
+  }> {
+    try {
+      const response = await fetchWithTimeout(
+        `${this.baseUrl}/providers/validate`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(dataset),
+        }
+      );
+      if (!response.ok) throw new Error(`Validate resource failed: ${response.status}`);
+      return await response.json();
+    } catch {
+      return {
+        valid: false,
+        errors: ["Validation request failed"],
+        warnings: [],
+        checks: {},
+      };
     }
   },
 };

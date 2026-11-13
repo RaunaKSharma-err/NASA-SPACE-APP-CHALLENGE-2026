@@ -67,6 +67,19 @@ export interface RouteResult {
   waypoints: { lat: number; lon: number; elevation: number }[];
   confidence: number;
   reasoning: string;
+  // Terrain-aware route metrics
+  straightLineDistanceM?: number;
+  distanceRatio?: number;
+  elevationGainM?: number;
+  elevationLossM?: number;
+  maxElevationM?: number | null;
+  minElevationM?: number | null;
+  highSlopeSegments?: number;
+  noDataCellsEncountered?: number;
+  terrainCoverage?: string;
+  hazardsEvaluated?: string[];
+  assumptions?: string[];
+  warnings?: string[];
 }
 
 export interface RouteRequest {
@@ -78,7 +91,11 @@ export interface RouteRequest {
   maxSlope: number;
   vehicleSpeed: number;
   regionId: RegionId;
+  elevationWeight?: number;
+  hazardWeight?: number;
 }
+
+export type AssistantProvider = 'live' | 'mock' | 'unavailable';
 
 export interface AssistantMessage {
   id: string;
@@ -89,6 +106,7 @@ export interface AssistantMessage {
   sources?: string[];
   uncertainty?: 'low' | 'medium' | 'high';
   error?: boolean;
+  provider?: AssistantProvider;
 }
 
 export interface AssistantRequest {
@@ -173,9 +191,17 @@ export interface BackendRouteResponse {
   coordinates: Array<{ lon: number; lat: number }>;
   horizontal_distance_m: number;
   surface_distance_m: number;
+  straight_line_distance_m: number;
+  distance_ratio: number;
   total_cost: number;
   max_slope_deg: number;
   mean_slope_deg: number;
+  elevation_gain_m: number;
+  elevation_loss_m: number;
+  max_elevation_m: number | null;
+  min_elevation_m: number | null;
+  high_slope_segments: number;
+  no_data_cells_encountered: number;
   hazards_evaluated: string[];
   assumptions: string[];
   warnings: string[];

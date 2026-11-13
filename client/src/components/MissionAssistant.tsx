@@ -15,12 +15,23 @@ export function MissionAssistant() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [input, setInput] = useState('');
+  const [providerMode, setProviderMode] = useState<'live' | 'mock' | 'checking'>('checking');
 
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages, loading]);
+
+  useEffect(() => {
+    let cancelled = false;
+    apiClient.checkProviderHealth().then((health) => {
+      if (!cancelled) {
+        setProviderMode(health.localEnabled ? 'live' : 'mock');
+      }
+    });
+    return () => { cancelled = true; };
+  }, []);
 
   const sendQuery = async (query: string) => {
     if (!query.trim() || loading) return;
@@ -78,9 +89,19 @@ export function MissionAssistant() {
       <div className="px-3 py-2.5 border-b border-[#344252]/40 flex items-center gap-2">
         <Bot className="text-accent-400" size={14} aria-hidden />
         <h3 className="section-title">Mission Assistant</h3>
-        <span className="ml-auto text-[9px] px-1.5 py-0.5 rounded bg-mission-caution/10 text-mission-caution font-mono uppercase" title="Responses are simulated, not from a live AI">
-          Fixture
-        </span>
+        {providerMode === 'checking' ? (
+          <span className="ml-auto text-[9px] px-1.5 py-0.5 rounded bg-[#344252]/60 text-[#8D9CAF] font-mono uppercase animate-pulse">
+            Checking provider…
+          </span>
+        ) : providerMode === 'live' ? (
+          <span className="ml-auto text-[9px] px-1.5 py-0.5 rounded bg-mission-nominal/20 text-mission-nominal border border-mission-nominal/30 font-mono uppercase">
+            Live LLM (Ollama)
+          </span>
+        ) : (
+          <span className="ml-auto text-[9px] px-1.5 py-0.5 rounded bg-mission-caution/20 text-mission-caution border border-mission-caution/30 font-mono uppercase" title="Backend unavailable — using local demo fixtures. Not a live AI response.">
+            Mock / Demo
+          </span>
+        )}
       </div>
 
       {/* Messages */}
@@ -121,6 +142,16 @@ export function MissionAssistant() {
                 <div className="flex items-center gap-1.5 mb-1">
                   <Bot size={11} className="text-accent-400" aria-hidden />
                   <span className="text-[9px] text-[#8D9CAF] font-mono uppercase">Assistant</span>
+                  {msg.provider === 'mock' && (
+                    <span className="text-[8px] px-1.5 py-0.5 rounded bg-mission-caution/20 text-mission-caution border border-mission-caution/30 font-mono uppercase">
+                      Mock
+                    </span>
+                  )}
+                  {msg.provider === 'unavailable' && (
+                    <span className="text-[8px] px-1.5 py-0.5 rounded bg-mission-critical/20 text-mission-critical border border-mission-critical/30 font-mono uppercase">
+                      Provider unavailable
+                    </span>
+                  )}
                   {msg.uncertainty && (
                     <span className={`text-[8px] px-1 py-0.5 rounded font-mono uppercase ${uncertaintyColor[msg.uncertainty]}`}>
                       {msg.uncertainty} uncertainty
@@ -158,7 +189,11 @@ export function MissionAssistant() {
               {msg.error && (
                 <div className="mt-1.5 flex items-center gap-1 text-[10px] text-mission-critical">
                   <AlertCircle size={10} aria-hidden />
-                  <span>Service error — using fallback</span>
+                  <span>
+                    {msg.provider === 'mock'
+                      ? 'Backend unreachable — showing demo fallback (not live AI)'
+                      : 'Service error — using fallback'}
+                  </span>
                 </div>
               )}
             </div>
@@ -200,7 +235,9 @@ export function MissionAssistant() {
         </div>
         <p className="text-[9px] text-[#8D9CAF] mt-1.5 flex items-center gap-1">
           <ExternalLink size={9} aria-hidden />
-          Development fixture — responses are simulated, not from a live AI
+          {providerMode === 'live'
+            ? 'Live LLM via Ollama (qwen2.5:0.5b) — general knowledge may be imprecise; project answers are evidence-grounded'
+            : 'Backend unavailable — showing demo fixtures. Not a live AI response.'}
         </p>
       </form>
     </div>

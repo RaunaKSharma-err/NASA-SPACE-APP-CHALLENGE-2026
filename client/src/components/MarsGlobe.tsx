@@ -3,9 +3,10 @@ import * as THREE from "three";
 import { useMissionStore } from "@/store/mission-store";
 import { TARGETS } from "@/data/mars-data";
 import type { TargetLocation, RouteResult } from "@/types";
+import { loadTerrain, createTerrainMesh, type TerrainData, surfaceRadiusAt, greatCircleInterpolate, latLonToVector3 } from "@/lib/mars-terrain";
 
 const MARS_RADIUS = 2;
-import marsTextureUrl from "@/public/textures/mars.png";
+import marsTextureUrl from "@/public/textures/8k_mars.jpg";
 
 const hazardColors: Record<TargetLocation["hazardLevel"], number> = {
   low: 0x34d399,
@@ -19,20 +20,6 @@ const routeHazardColors: Record<RouteResult["hazardLevel"], number> = {
   moderate: 0xfbbf24,
   high: 0xff6b72,
 };
-
-function latLonToVector3(
-  lat: number,
-  lon: number,
-  radius: number,
-): THREE.Vector3 {
-  const phi = (90 - lat) * (Math.PI / 180);
-  const theta = (lon + 180) * (Math.PI / 180);
-  return new THREE.Vector3(
-    -(radius * Math.sin(phi) * Math.cos(theta)),
-    radius * Math.cos(phi),
-    radius * Math.sin(phi) * Math.sin(theta),
-  );
-}
 
 interface MarkerHandle {
   mesh: THREE.Mesh;
@@ -74,6 +61,7 @@ export function MarsGlobe() {
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const globeRef = useRef<THREE.Mesh | null>(null);
+  const terrainMeshRef = useRef<THREE.Mesh | null>(null);
   const markersRef = useRef<Map<string, MarkerHandle>>(new Map());
   const routeLineRef = useRef<THREE.Line | null>(null);
   const raycasterRef = useRef(new THREE.Raycaster());
@@ -93,6 +81,7 @@ export function MarsGlobe() {
   // Texture loading state
   const [textureLoaded, setTextureLoaded] = useState(false);
   const [textureError, setTextureError] = useState(false);
+  const [terrainData, setTerrainData] = useState<TerrainData | null>(null);
 
   const selectedRegion = useMissionStore((s) => s.selectedRegion);
   const selectTarget = useMissionStore((s) => s.selectTarget);
@@ -178,6 +167,23 @@ export function MarsGlobe() {
         globeMat.map = texture;
         globeMat.needsUpdate = true;
         setTextureLoaded(true);
+
+        // Load MOLA terrain displacement for Gale Crater
+        loadTerrain("/terrain/gale-crater.asc")
+          .then((terrain) => {
+            if (!sceneRef.current) return; // unmounted
+            setTerrainData(terrain);
+            const terrainMesh = createTerrainMesh(terrain, texture, {
+              verticalExaggeration: 40,
+              baseRadius: MARS_RADIUS,
+              edgeFalloff: 0.12,
+            });
+            globe.add(terrainMesh);
+            terrainMeshRef.current = terrainMesh;
+          })
+          .catch((err) => {
+            console.warn("Failed to load MOLA terrain:", err);
+          });
       },
       undefined,
       (error) => {
@@ -356,6 +362,18 @@ export function MarsGlobe() {
       }
       // Dispose of the loaded texture to prevent memory leaks
       globeMat.dispose();
+      // Dispose terrain mesh
+      if (terrainMeshRef.current) {
+        const terrainMesh = terrainMeshRef.current;
+        terrainMesh.geometry.dispose();
+        if (terrainMesh.material instanceof THREE.Material) {
+          terrainMesh.material.dispose();
+        }
+        if (terrainMesh.parent) {
+          terrainMesh.parent.remove(terrainMesh);
+        }
+        terrainMeshRef.current = null;
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -374,9 +392,16 @@ export function MarsGlobe() {
     markersRef.current.clear();
 
     const targets = TARGETS.filter((t) => t.regionId === selectedRegion?.id);
+    const terrainOptions = {
+      baseRadius: MARS_RADIUS,
+      verticalExaggeration: 40,
+      edgeFalloff: 0.12,
+    };
     targets.forEach((target) => {
-      const pos = latLonToVector3(target.lat, target.lon, MARS_RADIUS * 1.02);
+      const surface = surfaceRadiusAt(terrainData, target.lat, target.lon, terrainOptions);
+      const radius = surface.valid ? surface.radius + 0.02 : MARS_RADIUS * 1.02;
       const color = hazardColors[target.hazardLevel];
+      const pos = latLonToVector3(target.lat, target.lon, radius);
 
       // Marker dot
       const dotGeo = new THREE.SphereGeometry(0.03, 12, 12);
@@ -403,7 +428,7 @@ export function MarsGlobe() {
 
       markersRef.current.set(target.id, { mesh: dot, pulse, label });
     });
-  }, [selectedRegion]);
+  }, [selectedRegion, terrainData]);
 
   // Highlight selected target
   useEffect(() => {
@@ -457,11 +482,30 @@ export function MarsGlobe() {
     const selectedRoute = routes.find((r) => r.id === selectedRouteId);
     if (!selectedRoute) return;
 
-    const points = selectedRoute.waypoints.map((wp) =>
-      latLonToVector3(wp.lat, wp.lon, MARS_RADIUS * 1.03),
-    );
+    const waypoints = selectedRoute.waypoints;
+    if (waypoints.length < 2) return;
 
-    if (points.length < 2) return;
+    const terrainOptions = {
+      baseRadius: MARS_RADIUS,
+      verticalExaggeration: 40,
+      edgeFalloff: 0.12,
+    };
+    const subdivisions = 12;
+    const points: THREE.Vector3[] = [];
+
+    for (let i = 0; i < waypoints.length - 1; i++) {
+      const a = waypoints[i];
+      const b = waypoints[i + 1];
+
+      for (let s = 0; s <= subdivisions; s++) {
+        if (i > 0 && s === 0) continue; // skip duplicate of previous segment endpoint
+        const t = s / subdivisions;
+        const { lat, lon } = greatCircleInterpolate(a.lat, a.lon, b.lat, b.lon, t);
+        const surface = surfaceRadiusAt(terrainData, lat, lon, terrainOptions);
+        const radius = surface.valid ? surface.radius : MARS_RADIUS;
+        points.push(latLonToVector3(lat, lon, radius + 0.03));
+      }
+    }
 
     const geometry = new THREE.BufferGeometry().setFromPoints(points);
     const color = routeHazardColors[selectedRoute.hazardLevel];
@@ -469,7 +513,7 @@ export function MarsGlobe() {
     const line = new THREE.Line(geometry, material);
     globe.add(line);
     routeLineRef.current = line;
-  }, [routes, selectedRouteId]);
+  }, [routes, selectedRouteId, terrainData]);
 
   // Toggle lighting based on elevation layer
   useEffect(() => {
@@ -512,7 +556,7 @@ export function MarsGlobe() {
           {textureError
             ? "Texture load failed — using fallback color"
             : textureLoaded
-              ? "Surface texture loaded (visual only)"
+              ? "Surface texture + MOLA terrain (Gale Crater)"
               : "Loading surface texture..."}
         </p>
       </div>

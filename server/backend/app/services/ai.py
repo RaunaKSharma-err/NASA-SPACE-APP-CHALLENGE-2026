@@ -6,6 +6,7 @@ the model never influences route validation (that lives in routing.py).
 from __future__ import annotations
 
 import json
+import logging
 import re
 import threading
 import urllib.error
@@ -14,6 +15,8 @@ from dataclasses import dataclass, field
 from typing import Protocol
 
 from app.core.config import get_settings
+
+logger = logging.getLogger("marsyn.assistant")
 
 
 @dataclass(frozen=True)
@@ -137,6 +140,96 @@ class AssistantResult:
     notes: list[str] = field(default_factory=list)
 
 
+# ---------------------------------------------------------------------------
+# Intent classification (deterministic, no model dependency)
+# ---------------------------------------------------------------------------
+
+_INTENT_CONVERSATIONAL = "conversational"   # greetings, chit-chat, jokes, general knowledge
+_INTENT_SCIENTIFIC = "scientific"           # Mars/science questions with project grounding
+
+_GREETING_STARTS = (
+    "hi", "hello", "hey", "hiya", "howdy", "greetings",
+    "good morning", "good afternoon", "good evening", "yo",
+)
+_CONVERSATIONAL_PHRASES = (
+    "how are you", "how's it going", "how is it going",
+    "tell me a joke", "joke", "funny", "laugh",
+    "thanks", "thank you", "thx",
+    "who are you", "what are you", "who is this", "what is this",
+    "what can you help me with", "what can you do", "help", "capabilities",
+    "your name", "your purpose", "introduce yourself", "tell me about yourself",
+    "nice to meet you", "goodbye", "bye", "see you",
+)
+# General knowledge topics that bypass project retrieval but use LLM knowledge
+_GENERAL_KNOWLEDGE_TOPICS = (
+    "earth", "the earth", "moon", "sun", "planet", "venus", "jupiter",
+    "gravity", "atmosphere", "climate", "space", "universe", "star",
+)
+
+
+def _classify_intent(query: str) -> str:
+    """Classify a query as conversational (bypass retrieval) or scientific (use retrieval).
+
+    Returns one of _INTENT_CONVERSATIONAL or _INTENT_SCIENTIFIC.
+    """
+    q = query.strip().lower().rstrip("?.!.,;")
+    if not q:
+        return _INTENT_SCIENTIFIC
+
+    # 1. Greetings and chit-chat
+    if q in _GREETING_STARTS:
+        return _INTENT_CONVERSATIONAL
+    if any(q.startswith(s + " ") for s in _GREETING_STARTS):
+        return _INTENT_CONVERSATIONAL
+    if any(p in q for p in _CONVERSATIONAL_PHRASES):
+        return _INTENT_CONVERSATIONAL
+
+    # Short greeting + optional word (e.g. "hi there", "hello MARSYN")
+    tokens = q.split()
+    if len(tokens) <= 3 and any(t in _GREETING_STARTS for t in tokens):
+        return _INTENT_CONVERSATIONAL
+
+    # 2. General knowledge questions (Earth, moon, planets, etc.) —
+    #    bypass project retrieval, answer from LLM general knowledge
+    if any(q.startswith(s + " ") for s in ("tell me about", "what is", "what are", "how does")):
+        if any(topic in q for topic in _GENERAL_KNOWLEDGE_TOPICS):
+            return _INTENT_CONVERSATIONAL
+
+    return _INTENT_SCIENTIFIC
+
+
+# ---------------------------------------------------------------------------
+# Prompt builders
+# ---------------------------------------------------------------------------
+
+def _build_conversational_prompt(query: str) -> str:
+    """Prompt for general conversation / general knowledge — no project evidence."""
+    return (
+        "You are the MARSYN mission assistant, an AI copilot for Mars exploration. "
+        "Respond naturally and helpfully. Use your general knowledge; do not claim "
+        "access to MARSYN project data unless the user asks about it. "
+        "If you mention scientific facts, note they are general knowledge, not "
+        "MARSYN project measurements. Keep responses concise.\n\n"
+        f"USER: {query}"
+    )
+
+
+def _build_grounded_prompt(query: str, evidence: list[Evidence]) -> str:
+    """Prompt for evidence-grounded responses — answer only from project evidence."""
+    ev = "\n".join(f"[{e.doc_id}] {e.title}: {e.snippet}" for e in evidence)
+    return (
+        "Answer using ONLY the evidence below. Do not use outside knowledge. "
+        "Do not invent numbers, distances, diameters, depths, or elevations. "
+        "If the evidence is insufficient, say so. Label facts as OBSERVATION or INFERENCE. "
+        "Cite [doc_id] for claims.\n"
+        f"EVIDENCE:\n{ev}\n\nQUESTION: {query}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# Token-based retrieval (unchanged)
+# ---------------------------------------------------------------------------
+
 _STOP = {"the", "and", "for", "what", "which", "that", "this", "with", "are", "from", "how", "does", "can"}
 
 
@@ -155,25 +248,80 @@ def retrieve(query: str, docs: list[Document], k: int = 3) -> list[Evidence]:
     return [Evidence(d.id, d.title, d.kind, d.text[:400], s) for s, d in scored[:k]]
 
 
-def build_prompt(query: str, evidence: list[Evidence]) -> str:
-    ev = "\n".join(f"[{e.doc_id}] {e.title}: {e.snippet}" for e in evidence)
-    return (
-        "Answer ONLY from the evidence below. Label statements as OBSERVATION (stated in evidence) "
-        "or INFERENCE (your reasoning). If the evidence is insufficient, say so. Cite [doc_id].\n"
-        f"EVIDENCE:\n{ev}\n\nQUESTION: {query}"
-    )
-
+# ---------------------------------------------------------------------------
+# Main entry point
+# ---------------------------------------------------------------------------
 
 def answer_query(query: str, docs: list[Document], provider: AIProvider) -> AssistantResult:
+    intent = _classify_intent(query)
+
+    # Structured debug logging (no secrets/tokens)
+    logger.info(
+        "assistant.query",
+        extra={
+            "query": query,
+            "intent": intent,
+            "provider": type(provider).__name__,
+        },
+    )
+
+    # ---- Path A: Conversational / general knowledge ----
+    if intent == _INTENT_CONVERSATIONAL:
+        logger.info("assistant.path", extra={"path": "conversational", "retrieval_invoked": False})
+        try:
+            text = provider.complete(_build_conversational_prompt(query))
+        except ProviderUnavailable:
+            logger.info("assistant.result", extra={"result": "provider_unavailable", "reason": "no_provider"})
+            return AssistantResult(
+                "provider_unavailable", None, [],
+                ["Conversational response requested but no AI provider is configured."],
+            )
+        logger.info("assistant.result", extra={"result": "ok", "llm_generated": True})
+        return AssistantResult(
+            "ok", text, [],
+            [
+                "Conversational response — no project-data retrieval.",
+                "LLM provider used — general knowledge.",
+            ],
+        )
+
+    # ---- Path B: Scientific / project-specific ----
+    logger.info("assistant.path", extra={"path": "scientific", "retrieval_invoked": True})
     evidence = retrieve(query, docs)
     if not evidence:
+        # Project meta-question: user is asking about what data/sources are available.
+        # Answer directly from the docs list (actual application data), no LLM needed.
+        ql = query.lower()
+        dataset_asked = any(w in ql for w in ("dataset", "data source", "data set", "loaded", "available"))
+        if docs and dataset_asked:
+            listing = "\n".join(f"- [{d.id}] {d.title} ({d.kind})" for d in docs)
+            text = (
+                "Project data currently loaded:\n"
+                f"{listing}\n"
+                f"Total: {len(docs)} dataset(s)."
+            )
+            logger.info("assistant.result", extra={"result": "ok", "llm_generated": False, "path": "project_meta_listing"})
+            return AssistantResult(
+                "ok", text, [],
+                [
+                    "Project meta-question answered from application data (no retrieval, no LLM).",
+                    f"{len(docs)} dataset(s) listed from registry.",
+                ],
+            )
+        # No project evidence — be honest rather than inventing or falling back to general knowledge.
+        # General-knowledge questions (Earth, moon, etc.) are already caught by the conversational
+        # classifier above, so anything reaching here is a project-specific query with no match.
+        logger.info("assistant.result", extra={"result": "no_evidence", "reason": "no_project_match"})
         return AssistantResult("no_evidence", None, [],
                                ["No project data or documentation matched this question."])
+
     try:
-        text = provider.complete(build_prompt(query, evidence))
+        text = provider.complete(_build_grounded_prompt(query, evidence))
     except ProviderUnavailable:
+        logger.info("assistant.result", extra={"result": "provider_unavailable", "reason": "no_provider_with_evidence"})
         return AssistantResult("provider_unavailable", None, evidence,
                                ["Retrieved evidence is shown; no generated answer is available."])
+    logger.info("assistant.result", extra={"result": "ok", "llm_generated": True, "grounded": True})
     return AssistantResult("ok", text, evidence, ["Generated text is not a validated scientific result."])
 
 

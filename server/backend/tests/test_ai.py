@@ -17,6 +17,8 @@ from app.services.ai import (
 DOCS = [
     Document("d1", "Synthetic elevation grid", "Elevation in metres. Limitations: synthetic fixture.", "dataset_metadata"),
     Document("d2", "Synthetic imagery", "Imagery coverage for the demo region.", "dataset_metadata"),
+    Document("d3", "Gale Crater region", "Gale Crater is located at lon 137.0-138.0, lat -5.5 to -4.5 on Mars. Elevation data extracted from MOLA MEGDR.", "dataset_metadata"),
+    Document("d4", "Available datasets", "Loaded datasets: MOLA MEGDR elevation grid, synthetic imagery. Terrain files available offline in processed directory.", "dataset_metadata"),
 ]
 
 
@@ -44,6 +46,121 @@ class Assistant(unittest.TestCase):
     def test_ok_path(self):
         r = answer_query("elevation units", DOCS, Provider())
         self.assertEqual((r.status, r.answer), ("ok", "stub answer"))
+
+
+class IntentRouting(unittest.TestCase):
+    """Conversational messages bypass project-data retrieval but use the LLM provider."""
+
+    class ConversationalProvider:
+        """Provider stub for conversational queries — no EVIDENCE section in prompt."""
+
+        def complete(self, prompt):
+            assert "EVIDENCE" not in prompt, "Conversational prompt must not contain EVIDENCE"
+            return "conversational stub answer"
+
+    class ScientificProvider:
+        """Provider stub for scientific queries — requires EVIDENCE in prompt."""
+
+        def complete(self, prompt):
+            assert "EVIDENCE" in prompt and "INFERENCE" in prompt
+            return "grounded stub answer"
+
+    def test_hi(self):
+        r = answer_query("hi", DOCS, self.ConversationalProvider())
+        self.assertEqual(r.status, "ok")
+        self.assertIsNotNone(r.answer)
+        self.assertEqual(r.evidence, [])
+        self.assertTrue(any("Conversational" in n for n in r.notes))
+
+    def test_hello(self):
+        r = answer_query("hello", DOCS, self.ConversationalProvider())
+        self.assertEqual(r.status, "ok")
+        self.assertIsNotNone(r.answer)
+        self.assertEqual(r.evidence, [])
+
+    def test_hey_there(self):
+        r = answer_query("hey there", DOCS, self.ConversationalProvider())
+        self.assertEqual(r.status, "ok")
+        self.assertIsNotNone(r.answer)
+        self.assertEqual(r.evidence, [])
+
+    def test_tell_me_a_joke(self):
+        r = answer_query("tell me a joke", DOCS, self.ConversationalProvider())
+        self.assertEqual(r.status, "ok")
+        self.assertIsNotNone(r.answer)
+        self.assertEqual(r.evidence, [])
+
+    def test_how_are_you(self):
+        r = answer_query("how are you", DOCS, self.ConversationalProvider())
+        self.assertEqual(r.status, "ok")
+        self.assertIsNotNone(r.answer)
+        self.assertEqual(r.evidence, [])
+
+    def test_tell_me_about_earth(self):
+        r = answer_query("tell me about earth", DOCS, self.ConversationalProvider())
+        self.assertEqual(r.status, "ok")
+        self.assertIsNotNone(r.answer)
+        self.assertEqual(r.evidence, [])
+
+    def test_thanks(self):
+        r = answer_query("thanks", DOCS, self.ConversationalProvider())
+        self.assertEqual(r.status, "ok")
+        self.assertIsNotNone(r.answer)
+        self.assertEqual(r.evidence, [])
+
+    def test_who_are_you(self):
+        r = answer_query("who are you?", DOCS, self.ConversationalProvider())
+        self.assertEqual(r.status, "ok")
+        self.assertIsNotNone(r.answer)
+        self.assertEqual(r.evidence, [])
+
+    def test_what_can_you_help(self):
+        r = answer_query("what can you help me with?", DOCS, self.ConversationalProvider())
+        self.assertEqual(r.status, "ok")
+        self.assertIsNotNone(r.answer)
+        self.assertEqual(r.evidence, [])
+
+    def test_scientific_still_uses_retrieval(self):
+        """Non-conversational queries still go through retrieval + provider."""
+        r = answer_query("elevation units", DOCS, self.ScientificProvider())
+        self.assertEqual(r.status, "ok")
+        self.assertEqual(r.answer, "grounded stub answer")
+        self.assertGreater(len(r.evidence), 0)
+
+    def test_no_evidence_still_returned_for_unmatched_scientific(self):
+        """Unmatched scientific queries return no_evidence, not a conversational answer."""
+        r = answer_query("quantum computing theory", DOCS, self.ConversationalProvider())
+        self.assertEqual(r.status, "no_evidence")
+        self.assertIsNone(r.answer)
+        self.assertEqual(r.evidence, [])
+
+    def test_scientific_gale_crater_uses_retrieval(self):
+        """Mars-specific query uses project retrieval and grounding."""
+        r = answer_query("what is Gale Crater", DOCS, self.ScientificProvider())
+        self.assertEqual(r.status, "ok")
+        self.assertEqual(r.answer, "grounded stub answer")
+        self.assertGreater(len(r.evidence), 0)
+
+    def test_scientific_elevation_query_uses_retrieval(self):
+        """Elevation query uses project retrieval and grounding."""
+        r = answer_query("what is the elevation of Gale Crater", DOCS, self.ScientificProvider())
+        self.assertEqual(r.status, "ok")
+        self.assertEqual(r.answer, "grounded stub answer")
+        self.assertGreater(len(r.evidence), 0)
+
+    def test_scientific_datasets_query_uses_retrieval(self):
+        """Dataset question uses project retrieval and grounding."""
+        r = answer_query("which datasets are currently loaded", DOCS, self.ScientificProvider())
+        self.assertEqual(r.status, "ok")
+        self.assertEqual(r.answer, "grounded stub answer")
+        self.assertGreater(len(r.evidence), 0)
+
+    def test_conversational_provider_unavailable_returns_error(self):
+        """Conversational query with no provider returns clear error, not fake response."""
+        r = answer_query("hi", DOCS, NullProvider())
+        self.assertEqual(r.status, "provider_unavailable")
+        self.assertIsNone(r.answer)
+        self.assertEqual(r.evidence, [])
 
 
 class OllamaProviderTests(unittest.TestCase):

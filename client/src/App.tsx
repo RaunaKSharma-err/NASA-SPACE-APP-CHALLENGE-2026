@@ -269,15 +269,15 @@ function Workspace() {
             </div>
 
             {/* Tab content */}
-            <div className="flex-1 overflow-y-auto min-h-0" role="tabpanel" id={`tabpanel-${rightTab}`}>
+            <div className="flex flex-col flex-1 overflow-y-auto min-h-0" role="tabpanel" id={`tabpanel-${rightTab}`}>
               {rightTab === 'target' && <TargetDetailsPanel />}
               {rightTab === 'route' && <RoutePlannerPanel />}
               {rightTab === 'assistant' && <MissionAssistant />}
-            </div>
 
-            {/* Provenance footer */}
-            <div className="border-t border-[#344252]/40 p-2 flex-shrink-0">
-              <DataProvenancePanel />
+              {/* Collapsible Data Provenance */}
+              <CollapsibleSection title="Data Provenance" defaultOpen={false}>
+                <DataProvenancePanel />
+              </CollapsibleSection>
             </div>
 
             {/* Resize handle */}

@@ -60,6 +60,24 @@ class Api(unittest.TestCase):
         r = self.c.post("/api/v1/assistant/query", json={"query": "anything at all"})
         self.assertEqual(r.json()["status"], "no_evidence")
 
+    def test_assistant_short_query_accepted(self):
+        for q in ("hi", "ok", "hello"):
+            r = self.c.post("/api/v1/assistant/query", json={"query": q})
+            self.assertEqual(r.status_code, 200, f"query {q!r} should be accepted")
+
+    def test_assistant_whitespace_query_rejected(self):
+        for q in (" ", "   ", "\t\n"):
+            r = self.c.post("/api/v1/assistant/query", json={"query": q})
+            self.assertEqual(r.status_code, 422, f"query {q!r} should be rejected")
+
+    def test_assistant_empty_query_rejected(self):
+        r = self.c.post("/api/v1/assistant/query", json={"query": ""})
+        self.assertEqual(r.status_code, 422)
+
+    def test_assistant_overlong_query_rejected(self):
+        r = self.c.post("/api/v1/assistant/query", json={"query": "x" * 501})
+        self.assertEqual(r.status_code, 422)
+
     def test_offline_regions_list(self):
         self.assertIsInstance(self.c.get("/api/v1/offline/regions").json(), list)
 
