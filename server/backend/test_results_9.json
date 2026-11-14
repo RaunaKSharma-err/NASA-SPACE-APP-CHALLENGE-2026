@@ -1,0 +1,101 @@
+﻿[
+    {
+        "n":  1,
+        "q":  "What is MOLA?",
+        "status":  "ok",
+        "ms":  525,
+        "docs":  "kb:instruments/mola.md#1 | kb:instruments/mola.md#2 | kb:instruments/mola.md#3 | mola-megdr",
+        "titles":  "MOLA (Mars Orbiter Laser Altimeter) | MOLA (Mars Orbiter Laser Altimeter) | MOLA (Mars Orbiter Laser Altimeter) | MOLA Mission Experiment Gridded Data Record (MEGDR)",
+        "answer":  "MOLA is the **Mars Orbiter Laser Altimeter**, an instrument that mapped Martian topography [kb:instruments/mola.md]. - **MOLA** stands for **Mars Orbiter Laser Altimeter**. - **Spacecraft:** NASA\u0027s **Mars Global Surveyor (MGS)**. - **Measurement:** Laser altimetry â it sent laser pulses to the Martian surface and measured return time to determine surface elevations/topography, supporting global topographic mapping. - **In MARSYN:** MARSYN uses a verified regional **MOLA MEGDR** elevation extract for **Gale Crater** (lon 137.0â138.0, lat -5.5 to -4.5, ~463 m/pixel, 128 px/degree). This is the only verified integrated scientific terrain dataset in MARSYN.",
+        "sources":  "kb:instruments/mola.md#1 || kb:instruments/mola.md#2 || kb:instruments/mola.md#3: https://pds-geosciences.wustl.edu/missions/mgs/mola.html || mola-megdr",
+        "notes":  "Deterministic, evidence-backed MOLA answer (not model-generated)."
+    },
+    {
+        "n":  2,
+        "q":  "What does MOLA stand for?",
+        "status":  "ok",
+        "ms":  32,
+        "docs":  "kb:instruments/mola.md#1 | kb:instruments/mola.md#2 | kb:instruments/mola.md#3 | mola-megdr",
+        "titles":  "MOLA (Mars Orbiter Laser Altimeter) | MOLA (Mars Orbiter Laser Altimeter) | MOLA (Mars Orbiter Laser Altimeter) | MOLA Mission Experiment Gridded Data Record (MEGDR)",
+        "answer":  "MOLA stands for **Mars Orbiter Laser Altimeter** [kb:instruments/mola.md]. - **MOLA** stands for **Mars Orbiter Laser Altimeter**. - **Spacecraft:** NASA\u0027s **Mars Global Surveyor (MGS)**. - **Measurement:** Laser altimetry â it sent laser pulses to the Martian surface and measured return time to determine surface elevations/topography, supporting global topographic mapping. ",
+        "sources":  "kb:instruments/mola.md#1 || kb:instruments/mola.md#2 || kb:instruments/mola.md#3: https://pds-geosciences.wustl.edu/missions/mgs/mola.html || mola-megdr",
+        "notes":  "Deterministic, evidence-backed MOLA answer (not model-generated)."
+    },
+    {
+        "n":  3,
+        "q":  "Which spacecraft carried MOLA?",
+        "status":  "ok",
+        "ms":  32,
+        "docs":  "kb:instruments/mola.md#1 | kb:instruments/mola.md#2 | kb:instruments/mola.md#3 | mola-megdr",
+        "titles":  "MOLA (Mars Orbiter Laser Altimeter) | MOLA (Mars Orbiter Laser Altimeter) | MOLA (Mars Orbiter Laser Altimeter) | MOLA Mission Experiment Gridded Data Record (MEGDR)",
+        "answer":  "MOLA was aboard NASA\u0027s **Mars Global Surveyor (MGS)** spacecraft [kb:instruments/mola.md]. - **MOLA** stands for **Mars Orbiter Laser Altimeter**. - **Spacecraft:** NASA\u0027s **Mars Global Surveyor (MGS)**. - **Measurement:** Laser altimetry â it sent laser pulses to the Martian surface and measured return time to determine surface elevations/topography, supporting global topographic mapping. ",
+        "sources":  "kb:instruments/mola.md#1 || kb:instruments/mola.md#2 || kb:instruments/mola.md#3: https://pds-geosciences.wustl.edu/missions/mgs/mola.html || mola-megdr",
+        "notes":  "Deterministic, evidence-backed MOLA answer (not model-generated)."
+    },
+    {
+        "n":  4,
+        "q":  "Why does MARSYN use MOLA?",
+        "status":  "ok",
+        "ms":  31,
+        "docs":  "kb:instruments/mola.md#1 | kb:instruments/mola.md#2 | kb:instruments/mola.md#3 | mola-megdr",
+        "titles":  "MOLA (Mars Orbiter Laser Altimeter) | MOLA (Mars Orbiter Laser Altimeter) | MOLA (Mars Orbiter Laser Altimeter) | MOLA Mission Experiment Gridded Data Record (MEGDR)",
+        "answer":  "MARSYN uses MOLA elevation data for terrain-aware visualization and routing [kb:instruments/mola.md]. - **MOLA** stands for **Mars Orbiter Laser Altimeter**. - **Spacecraft:** NASA\u0027s **Mars Global Surveyor (MGS)**. - **Measurement:** Laser altimetry â it sent laser pulses to the Martian surface and measured return time to determine surface elevations/topography, supporting global topographic mapping. - **In MARSYN:** MARSYN uses a verified regional **MOLA MEGDR** elevation extract for **Gale Crater** (lon 137.0â138.0, lat -5.5 to -4.5, ~463 m/pixel, 128 px/degree). This is the only verified integrated scientific terrain dataset in MARSYN.",
+        "sources":  "kb:instruments/mola.md#1 || kb:instruments/mola.md#2 || kb:instruments/mola.md#3: https://pds-geosciences.wustl.edu/missions/mgs/mola.html || mola-megdr",
+        "notes":  "Deterministic, evidence-backed MOLA answer (not model-generated)."
+    },
+    {
+        "n":  5,
+        "q":  "What is Gale Crater?",
+        "status":  "ok",
+        "ms":  65,
+        "docs":  "kb:locations/gale_crater.md#1 | kb:locations/gale_crater.md#2 | kb:locations/gale_crater.md#3 | gale-crater",
+        "titles":  "Gale Crater | Gale Crater | Gale Crater | Gale Crater",
+        "answer":  "Gale Crater is an impact crater on Mars explored by NASA\u0027s Curiosity rover [kb:locations/gale_crater.md]. - **Gale Crater** is an impact crater on Mars in the Aeolis region, near the Martian equator. - **Approximate location:** ~5.4Â°S, 137.8Â°E; diameter ~154 km [kb:locations/gale_crater.md]. - **Rover:** NASA\u0027s **Curiosity** rover (Mars Science Laboratory) landed in Gale Crater at **Bradbury Landing on August 6, 2012 (UTC)**. - **Mount Sharp (Aeolis Mons):** A central mound within Gale Crater with layered sedimentary rocks rising several kilometers above parts of the crater floor. - **Scientific importance:** Curiosity investigates Gale\u0027s geology and evidence of past environmental conditions that could have supported microbial life (habitability does not mean life was found).  Note: The origin of the crater\u0027s name is not stated in MARSYN\u0027s verified evidence; no naming attribution is assumed.",
+        "sources":  "kb:locations/gale_crater.md#1 || kb:locations/gale_crater.md#2 || kb:locations/gale_crater.md#3: https://mars.nasa.gov/msl/mission/science/landing-site/ || gale-crater",
+        "notes":  "Deterministic, evidence-backed Gale Crater answer (not model-generated)."
+    },
+    {
+        "n":  6,
+        "q":  "Where is Gale Crater?",
+        "status":  "ok",
+        "ms":  34,
+        "docs":  "kb:locations/gale_crater.md#1 | kb:locations/gale_crater.md#2 | kb:locations/gale_crater.md#3 | gale-crater",
+        "titles":  "Gale Crater | Gale Crater | Gale Crater | Gale Crater",
+        "answer":  "Gale Crater is located near the Martian equator in the Aeolis region [kb:locations/gale_crater.md]. - **Gale Crater** is an impact crater on Mars in the Aeolis region, near the Martian equator. - **Approximate location:** ~5.4Â°S, 137.8Â°E; diameter ~154 km [kb:locations/gale_crater.md]. - **Rover:** NASA\u0027s **Curiosity** rover (Mars Science Laboratory) landed in Gale Crater at **Bradbury Landing on August 6, 2012 (UTC)**. - **Mount Sharp (Aeolis Mons):** A central mound within Gale Crater with layered sedimentary rocks rising several kilometers above parts of the crater floor. - **Scientific importance:** Curiosity investigates Gale\u0027s geology and evidence of past environmental conditions that could have supported microbial life (habitability does not mean life was found).  Note: The origin of the crater\u0027s name is not stated in MARSYN\u0027s verified evidence; no naming attribution is assumed.",
+        "sources":  "kb:locations/gale_crater.md#1 || kb:locations/gale_crater.md#2 || kb:locations/gale_crater.md#3: https://mars.nasa.gov/msl/mission/science/landing-site/ || gale-crater",
+        "notes":  "Deterministic, evidence-backed Gale Crater answer (not model-generated)."
+    },
+    {
+        "n":  7,
+        "q":  "Which rover explored Gale Crater?",
+        "status":  "ok",
+        "ms":  40,
+        "docs":  "kb:locations/gale_crater.md#1 | kb:locations/gale_crater.md#2 | kb:locations/gale_crater.md#3 | gale-crater",
+        "titles":  "Gale Crater | Gale Crater | Gale Crater | Gale Crater",
+        "answer":  "NASA\u0027s **Curiosity** rover explored (and continues to explore) Gale Crater [kb:locations/gale_crater.md]. - **Gale Crater** is an impact crater on Mars in the Aeolis region, near the Martian equator. - **Approximate location:** ~5.4Â°S, 137.8Â°E; diameter ~154 km [kb:locations/gale_crater.md]. - **Rover:** NASA\u0027s **Curiosity** rover (Mars Science Laboratory) landed in Gale Crater at **Bradbury Landing on August 6, 2012 (UTC)**. - **Mount Sharp (Aeolis Mons):** A central mound within Gale Crater with layered sedimentary rocks rising several kilometers above parts of the crater floor. - **Scientific importance:** Curiosity investigates Gale\u0027s geology and evidence of past environmental conditions that could have supported microbial life (habitability does not mean life was found).  Note: The origin of the crater\u0027s name is not stated in MARSYN\u0027s verified evidence; no naming attribution is assumed.",
+        "sources":  "kb:locations/gale_crater.md#1 || kb:locations/gale_crater.md#2 || kb:locations/gale_crater.md#3: https://mars.nasa.gov/msl/mission/science/landing-site/ || gale-crater",
+        "notes":  "Deterministic, evidence-backed Gale Crater answer (not model-generated)."
+    },
+    {
+        "n":  8,
+        "q":  "What is Mount Sharp?",
+        "status":  "ok",
+        "ms":  32,
+        "docs":  "kb:locations/mount_sharp.md#1 | kb:locations/mount_sharp.md#2 | gale-crater",
+        "titles":  "Mount Sharp (Aeolis Mons) | Mount Sharp (Aeolis Mons) | Gale Crater",
+        "answer":  "**Mount Sharp (Aeolis Mons)** is the central mound inside Gale Crater on Mars [kb:locations/mount_sharp.md]. - It rises about 5 km above the crater floor in its highest areas and contains layered sedimentary rocks. - NASA\u0027s Curiosity rover has been ascending Mount Sharp to study layered rocks and evidence of past environments that could have supported microbial life. - Gale Crater is ~154 km in diameter near ~5.4Â°S, 137.8Â°E; Curiosity landed there in August 2012. Note: The origin of the crater\u0027s name is not stated in MARSYN\u0027s verified evidence; no naming attribution is assumed.",
+        "sources":  "kb:locations/mount_sharp.md#1 || kb:locations/mount_sharp.md#2: https://mars.nasa.gov/resources/8192/mount-sharp-inside-gale-crater/ || gale-crater",
+        "notes":  "Deterministic, evidence-backed Gale Crater answer (not model-generated)."
+    },
+    {
+        "n":  9,
+        "q":  "Tell me about Mars.",
+        "status":  "ok",
+        "ms":  47868,
+        "docs":  "kb:mars/mars_overview.md#1 | kb:mars/mars_physical_characteristics.md#1 | kb:mars/mars_orbit_rotation_seasons.md#1 | kb:mars/mars_atmosphere_climate.md#1 | kb:mars/mars_surface_geology.md#1 | kb:mars/mars_moons.md#1",
+        "titles":  "Mars Overview | Mars Physical Characteristics | Mars Orbit, Rotation, and Seasons | Mars Atmosphere and Climate | Mars Surface and Geology | Mars Moons: Phobos and Deimos",
+        "answer":  "Mars is the fourth planet from the Sun and a rocky (terrestrial) planet. It is often called the Red Planet because iron oxide (rust) in its surface materials gives it a reddish appearance.   Mars is a terrestrial planet with a rocky crust, mantle, and core. The planet\u0027s surface includes ancient cratered highlands, volcanic regions, large canyons, and polar ice deposits. The planet\u0027s reddish color comes largely from iron oxide (rust) in its surface materials.  Mars is approximately 227.9 million kilometers from the Sun, making it one of the closest planets to Earth. Its average distance from the Sun is about 1.52 astronomical units (AU), which is about 1.52 times the distance from the Earth to the Sun.  Mars has a mean radius of approximately 3.3895 kilometers, which is about 3.390 kilometers in the case of Earth\u0027s radius. The average surface gravity on Mars is about 3.71 meters per second squared, which is about 3.72 meters per second squared on Earth.  The planet\u0027s surface is covered with ancient cratered highlands, volcanic regions, large canyons, and polar ice deposits. The surface is also covered with a thin atmosphere, which is primarily carbon dioxide (CO2) with a small amount of nitrogen (N2) and argon (Ar).  Mars has a sidereal day of approximately 24 hours 37 minutes 22 seconds, which is about 2",
+        "sources":  "kb:mars/mars_overview.md#1 || kb:mars/mars_physical_characteristics.md#1 || kb:mars/mars_orbit_rotation_seasons.md#1 || kb:mars/mars_atmosphere_climate.md#1 || kb:mars/mars_surface_geology.md#1 || kb:mars/mars_moons.md#1",
+        "notes":  "Generated text grounded in retrieved evidence; verify critical values against sources."
+    }
+]

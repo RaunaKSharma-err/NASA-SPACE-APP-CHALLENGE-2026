@@ -1,0 +1,312 @@
+﻿[
+    {
+        "n":  1,
+        "q":  "Tell me about Mars.",
+        "status":  "ok",
+        "ms":  32198,
+        "docs":  "Mars Environmental Hazards | Mars Environmental Hazards | Human Exploration of Mars | Human Exploration of Mars | Human Exploration of Mars | Spacesuits and Mobility for Mars (Concepts)",
+        "answer":  "### Mars Mars is the fourth planet from the Sun and the second nearest planet to the Sun to Earth. It is a terrestrial planet with a thin atmosphere and a surface covered by a rocky, dry surface composed primarily of dust and regolith. The Martian environment is characterized by its low atmospheric pressure, dust storms, and extreme temperatures.  #### Radiation Mars lacks a strong global magnetic field and has a thin atmosphere, which means surface radiation exposure is higher than on Earth. So...",
+        "sources":  "Mars Environmental Hazards || Mars Environmental Hazards: https://www.nasa.gov/hrp/hazards/ || Human Exploration of Mars || Human Exploration of Mars || Human Exploration of Mars: https://www.nasa.gov/humans-in-space/humans-to-mars/ || Spacesuits and Mobility for Mars (Concepts)",
+        "notes":  "Generated text grounded in retrieved evidence; verify critical values against sources."
+    },
+    {
+        "n":  2,
+        "q":  "Why is Mars called the Red Planet?",
+        "status":  "ok",
+        "ms":  10780,
+        "docs":  "Mars Overview | Mars Physical Characteristics | Mars Surface and Geology | Mars Environmental Hazards",
+        "answer":  "Mars is called the Red Planet because its reddish appearance is due to iron oxide (rust) in its surface materials.",
+        "sources":  "Mars Overview || Mars Physical Characteristics || Mars Surface and Geology || Mars Environmental Hazards",
+        "notes":  "Generated text grounded in retrieved evidence; verify critical values against sources."
+    },
+    {
+        "n":  3,
+        "q":  "How big is Mars?",
+        "status":  "ok",
+        "ms":  16538,
+        "docs":  "Mars Environmental Hazards | Human Exploration of Mars | CRISM (Compact Reconnaissance Imaging Spectrometer for Mars) | CRISM (Compact Reconnaissance Imaging Spectrometer for Mars) | MOLA (Mars Orbiter Laser Altimeter) | MOLA (Mars Orbiter Laser Altimeter)",
+        "answer":  "Mars is approximately 6.7 million miles (10.1 million kilometers) in diameter.",
+        "sources":  "Mars Environmental Hazards || Human Exploration of Mars: https://www.nasa.gov/humans-in-space/humans-to-mars/ || CRISM (Compact Reconnaissance Imaging Spectrometer for Mars): NASA || CRISM (Compact Reconnaissance Imaging Spectrometer for Mars): https://crism.jhuapl.edu/ || MOLA (Mars Orbiter Laser Altimeter): NASA || MOLA (Mars Orbiter Laser Altimeter)",
+        "notes":  "Generated text grounded in retrieved evidence; verify critical values against sources."
+    },
+    {
+        "n":  4,
+        "q":  "How long is a day on Mars?",
+        "status":  "ok",
+        "ms":  8589,
+        "docs":  "Mars Environmental Hazards | Mars Overview | Mars Water and Habitability | Human Exploration of Mars",
+        "answer":  "On Mars, a day is approximately 24 hours and 39 minutes long. This duration is due to the planet\u0027s thin atmosphere and lack of a strong global magnetic field.",
+        "sources":  "Mars Environmental Hazards || Mars Overview || Mars Water and Habitability || Human Exploration of Mars",
+        "notes":  "Generated text grounded in retrieved evidence; verify critical values against sources."
+    },
+    {
+        "n":  5,
+        "q":  "How long is a year on Mars?",
+        "status":  "ok",
+        "ms":  7772,
+        "docs":  "Mars Environmental Hazards | Human Exploration of Mars | CRISM (Compact Reconnaissance Imaging Spectrometer for Mars) | CRISM (Compact Reconnaissance Imaging Spectrometer for Mars)",
+        "answer":  "A year on Mars is approximately 687 Earth days.",
+        "sources":  "Mars Environmental Hazards || Human Exploration of Mars || CRISM (Compact Reconnaissance Imaging Spectrometer for Mars): NASA || CRISM (Compact Reconnaissance Imaging Spectrometer for Mars): https://crism.jhuapl.edu/",
+        "notes":  "Generated text grounded in retrieved evidence; verify critical values against sources."
+    },
+    {
+        "n":  6,
+        "q":  "What is the atmosphere of Mars made of?",
+        "status":  "ok",
+        "ms":  11483,
+        "docs":  "Mars Atmosphere and Climate | Mars Environmental Hazards | Human Exploration of Mars | SAM (Sample Analysis at Mars)",
+        "answer":  "The atmosphere of Mars is primarily composed of carbon dioxide (CO2) and nitrogen (N2). The percentage of oxygen (O2) and other gases is very low, approximately 0.13%. The remaining components are trace amounts of water vapor and other gases.",
+        "sources":  "Mars Atmosphere and Climate || Mars Environmental Hazards || Human Exploration of Mars: https://www.nasa.gov/humans-in-space/humans-to-mars/ || SAM (Sample Analysis at Mars): NASA",
+        "notes":  "Generated text grounded in retrieved evidence; verify critical values against sources."
+    },
+    {
+        "n":  7,
+        "q":  "Could humans breathe on Mars?",
+        "status":  "ok",
+        "ms":  12444,
+        "docs":  "Mars Atmosphere and Climate | Mars Environmental Hazards | Human Exploration of Mars | Human Exploration of Mars",
+        "answer":  "Humans cannot breathe the Martian atmosphere. The low pressure and thin atmosphere of Mars make it inhospitable for humans to breathe. The average surface pressure of Mars is approximately 610 Pa, which is about 0.6% of Earth\u0027s sea level. This low pressure means that unprotected humans cannot survive on the surface of Mars. Additionally, the thin atmosphere of Mars does not provide enough oxygen for humans to breathe. The lack of a strong global magnetic field and thin atmosphere also make it di...",
+        "sources":  "Mars Atmosphere and Climate: https://science.nasa.gov/mars/facts/ || Mars Environmental Hazards || Human Exploration of Mars || Human Exploration of Mars",
+        "notes":  "Generated text grounded in retrieved evidence; verify critical values against sources."
+    },
+    {
+        "n":  8,
+        "q":  "Why is Mars so cold?",
+        "status":  "ok",
+        "ms":  11902,
+        "docs":  "Mars Environmental Hazards | Mars Atmosphere and Climate | Mars Surface and Geology | Mars Water and Habitability",
+        "answer":  "Mars is cold due to its lack of a strong global magnetic field and thin atmosphere. The surface radiation exposure is higher than on Earth, and the average surface pressure is around 0.6% of Earth\u0027s sea level. The atmosphere is primarily composed of carbon dioxide (CO2), with trace amounts of nitrogen (N2), argon (Ar), oxygen (O2), carbon monoxide (CO), and water vapor. The high surface pressure and thin atmosphere make it difficult for humans to survive in Mars\u0027 harsh environment.",
+        "sources":  "Mars Environmental Hazards || Mars Atmosphere and Climate || Mars Surface and Geology || Mars Water and Habitability",
+        "notes":  "Generated text grounded in retrieved evidence; verify critical values against sources."
+    },
+    {
+        "n":  9,
+        "q":  "What are dust storms?",
+        "status":  "ok",
+        "ms":  20254,
+        "docs":  "Mars Environmental Hazards | Mars Atmosphere and Climate | Mars Orbit, Rotation, and Seasons | Human Exploration of Mars | Marswalk Planning (Conceptual) | Spacesuits and Mobility for Mars (Concepts)",
+        "answer":  "Dust storms can reduce visibility and solar power availability on Mars, posing risks to both humans and rovers. These storms can occur due to winds, dust, and other factors, and their severity can vary depending on local conditions. The NASA Mars Environment Hazards (MAH) website provides detailed information on dust hazards, including how they affect seals, mechanisms, optics, solar panels, and human health. Additionally, the Mars Atmosphere and Climate Science (MACAS) website offers insights i...",
+        "sources":  "Mars Environmental Hazards: https://www.nasa.gov/hrp/hazards/ || Mars Atmosphere and Climate: https://science.nasa.gov/mars/facts/ || Mars Orbit, Rotation, and Seasons: https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html || Human Exploration of Mars || Marswalk Planning (Conceptual) || Spacesuits and Mobility for Mars (Concepts)",
+        "notes":  "Generated text grounded in retrieved evidence; verify critical values against sources."
+    },
+    {
+        "n":  10,
+        "q":  "What radiation risks exist on Mars?",
+        "status":  "ok",
+        "ms":  21010,
+        "docs":  "Mars Environmental Hazards | Mars Environmental Hazards | Human Exploration of Mars | Mars Physical Characteristics",
+        "answer":  "Radiation risks on Mars include:  - Surface radiation exposure is higher than on Earth due to the thin atmosphere and lack of a strong global magnetic field. - Sources include galactic cosmic rays and solar particle events. - Radiation is a major concern for long-duration human missions.  ### Dust - Fine dust can affect seals, mechanisms, optics, solar panels, and human health if inhaled inside habitats. - Dust storms can reduce visibility and solar power availability.  ### Terrain and Mobility ...",
+        "sources":  "Mars Environmental Hazards || Mars Environmental Hazards: https://www.nasa.gov/hrp/hazards/ || Human Exploration of Mars || Mars Physical Characteristics: https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html",
+        "notes":  "Generated text grounded in retrieved evidence; verify critical values against sources."
+    },
+    {
+        "n":  11,
+        "q":  "Does Mars have moons?",
+        "status":  "ok",
+        "ms":  31663,
+        "docs":  "Mars Moons: Phobos and Deimos | Mars Moons: Phobos and Deimos | Earth vs Mars | Mars Environmental Hazards | Mars Environmental Hazards | Human Exploration of Mars",
+        "answer":  "Yes, Mars does have moons. The key evidence for this is provided in the following points:  1. **Phobos and Deimos:**    - **Phobos:** The evidence states that Phobos is a small, irregularly shaped moon of Mars, with a mean radius of ~11.1 km and a surface gravity of ~9.81 m/sÂ² (1 g). It is much smaller than Earth\u0027s Moon and has low surface gravity.    - **Deimos:** The evidence indicates that Deimos is a moon of Mars, with a mean radius of ~6.2 km and an orbital period of ~30 hours 18 minutes. ...",
+        "sources":  "Mars Moons: Phobos and Deimos || Mars Moons: Phobos and Deimos: https://science.nasa.gov/mars/moons/phobos/ || Earth vs Mars || Mars Environmental Hazards || Mars Environmental Hazards: https://www.nasa.gov/hrp/hazards/ || Human Exploration of Mars",
+        "notes":  "Generated text grounded in retrieved evidence; verify critical values against sources."
+    },
+    {
+        "n":  12,
+        "q":  "What is Olympus Mons?",
+        "status":  "ok",
+        "ms":  18410,
+        "docs":  "Olympus Mons | Olympus Mons | Mount Sharp (Aeolis Mons) | Mars Surface and Geology | Mount Sharp (Aeolis Mons) | Mars Science Laboratory (Curiosity Rover)",
+        "answer":  "Olympus Mons is the largest known volcano in the Solar System, located in the Tharsis region of Mars. It is a shield volcano with a height of ~21â22 km above Mars\u0027 datum and an across the base of ~600 km. Olympus Mons is ~80 km wide at the summit region.",
+        "sources":  "Olympus Mons || Olympus Mons: https://science.nasa.gov/resource/olympus-mons/ || Mount Sharp (Aeolis Mons): NASA || Mars Surface and Geology || Mount Sharp (Aeolis Mons): https://mars.nasa.gov/resources/8192/mount-sharp-inside-gale-crater/ || Mars Science Laboratory (Curiosity Rover)",
+        "notes":  "Generated text grounded in retrieved evidence; verify critical values against sources."
+    },
+    {
+        "n":  13,
+        "q":  "What is Valles Marineris?",
+        "status":  "ok",
+        "ms":  19477,
+        "docs":  "Valles Marineris | Valles Marineris | Mars Surface and Geology | Mars Environmental Hazards | Human Exploration of Mars | ChemCam (Chemistry and Camera)",
+        "answer":  "Valles Marineris is a vast canyon system on Mars and one of the largest in the Solar System. It is located near the Martian equator, east of the Tharsis region. The canyon system is approximately 4,000 kilometers long, with a width of up to 200 kilometers in some places and a depth of up to 7 kilometers. The location of Valles Marineris is near the Martian equator, east of the Tharsis region.",
+        "sources":  "Valles Marineris || Valles Marineris: https://science.nasa.gov/resource/valles-marineris/ || Mars Surface and Geology || Mars Environmental Hazards || Human Exploration of Mars: https://www.nasa.gov/humans-in-space/humans-to-mars/ || ChemCam (Chemistry and Camera): NASA",
+        "notes":  "Generated text grounded in retrieved evidence; verify critical values against sources."
+    },
+    {
+        "n":  14,
+        "q":  "Was there water on ancient Mars?",
+        "status":  "ok",
+        "ms":  17030,
+        "docs":  "Mars Water and Habitability | Mars Water and Habitability | Human Exploration of Mars | CRISM (Compact Reconnaissance Imaging Spectrometer for Mars)",
+        "answer":  "Yes, there was water on ancient Mars. Multiple lines of evidence indicate that liquid water existed on Mars:  1. **Valley networks and channels:** Suggest past surface water flow in some regions. 2. **Delta and lake deposits:** Sedimentary structures consistent with standing water and river deltas. 3. **Hydrated minerals:** Clays and sulfates detected from orbit and by rovers indicate past water-related alteration. 4. **Rove:** The presence of hydrated minerals and the presence of hydrated miner...",
+        "sources":  "Mars Water and Habitability || Mars Water and Habitability || Human Exploration of Mars || CRISM (Compact Reconnaissance Imaging Spectrometer for Mars): NASA",
+        "notes":  "Generated text grounded in retrieved evidence; verify critical values against sources."
+    },
+    {
+        "n":  15,
+        "q":  "What evidence suggests Mars was once habitable?",
+        "status":  "ok",
+        "ms":  22120,
+        "docs":  "Mars Water and Habitability | Mars Water and Habitability | Mars Science Laboratory (Curiosity Rover) | Mount Sharp (Aeolis Mons)",
+        "answer":  "Based on the evidence provided, Mars was once habitable. The key evidence includes:  1. **Present-Day Water:** The evidence suggests that Mars has water ice, which is stable under normal conditions and can be found in polar regions. This indicates that water was once present on Mars and was likely accessible to life.  2. **Subsurface Ice:** The presence of seasonal CO2 ice beneath the surface suggests that Mars once had a significant water ice layer. This is consistent with the idea that Mars on...",
+        "sources":  "Mars Water and Habitability || Mars Water and Habitability: https://science.nasa.gov/mars/facts/ || Mars Science Laboratory (Curiosity Rover) || Mount Sharp (Aeolis Mons): NASA",
+        "notes":  "Generated text grounded in retrieved evidence; verify critical values against sources."
+    },
+    {
+        "n":  16,
+        "q":  "What did Curiosity discover?",
+        "status":  "ok",
+        "ms":  18310,
+        "docs":  "Mars Science Laboratory (Curiosity Rover) | Mars Science Laboratory (Curiosity Rover) | Mars Science Laboratory (Curiosity Rover) | Mars Science Laboratory (Curiosity Rover) | ChemCam (Chemistry and Camera) | ChemCam (Chemistry and Camera)",
+        "answer":  "Curiosity discovered evidence that ancient Gale Crater had environments with liquid water and conditions that could have supported microbial life in the past. This discovery was made possible by the use of the ChemCam instrument, which uses a laser to vaporize small amounts of rock or soil from a distance and analyzes the resulting plasma to determine elemental composition. The data collected by ChemCam helped identify sedimentary rocks and mineral transitions in Mount Sharp\u0027s layers, and measur...",
+        "sources":  "Mars Science Laboratory (Curiosity Rover) || Mars Science Laboratory (Curiosity Rover) || Mars Science Laboratory (Curiosity Rover) || Mars Science Laboratory (Curiosity Rover): https://science.nasa.gov/mission/msl-curiosity/ || ChemCam (Chemistry and Camera): NASA || ChemCam (Chemistry and Camera): https://mars.nasa.gov/msl/spacecraft/instruments/chemcam/",
+        "notes":  "Generated text grounded in retrieved evidence; verify critical values against sources."
+    },
+    {
+        "n":  17,
+        "q":  "What is the purpose of Perseverance?",
+        "status":  "ok",
+        "ms":  11433,
+        "docs":  "Mars 2020 (Perseverance Rover) | Human Exploration of Mars | CRISM (Compact Reconnaissance Imaging Spectrometer for Mars) | Mastcam and Mastcam-Z",
+        "answer":  "The purpose of Perseverance is to explore Jezero Crater to study its geology, seek signs of ancient microbial life, collect and cache samples for possible future return to Earth, and test technologies for future human exploration.",
+        "sources":  "Mars 2020 (Perseverance Rover) || Human Exploration of Mars: https://www.nasa.gov/humans-in-space/humans-to-mars/ || CRISM (Compact Reconnaissance Imaging Spectrometer for Mars): NASA || Mastcam and Mastcam-Z: NASA",
+        "notes":  "Generated text grounded in retrieved evidence; verify critical values against sources."
+    },
+    {
+        "n":  18,
+        "q":  "What is MOLA?",
+        "status":  "ok",
+        "ms":  19002,
+        "docs":  "MOLA Mission Experiment Gridded Data Record (MEGDR) | MOLA (Mars Orbiter Laser Altimeter) | MOLA (Mars Orbiter Laser Altimeter) | Gale Crater | MOLA (Mars Orbiter Laser Altimeter) | Jezero Crater",
+        "answer":  "MOLA (Mars Orbiter Laser Altimeter) is an instrument on NASA\u0027s Mars Global Surveyor (MGS) that measures the topography (elevation) of Mars using laser altimetry.",
+        "sources":  "MOLA Mission Experiment Gridded Data Record (MEGDR): NASA || MOLA (Mars Orbiter Laser Altimeter): NASA || MOLA (Mars Orbiter Laser Altimeter) || Gale Crater || MOLA (Mars Orbiter Laser Altimeter): https://pds-geosciences.wustl.edu/missions/mgs/mola.html || Jezero Crater: https://mars.nasa.gov/mars2020/mission/science/landing-site/",
+        "notes":  "Generated text grounded in retrieved evidence; verify critical values against sources."
+    },
+    {
+        "n":  19,
+        "q":  "What does HiRISE measure?",
+        "status":  "ok",
+        "ms":  16951,
+        "docs":  "HiRISE (High Resolution Imaging Science Experiment) | HiRISE (High Resolution Imaging Science Experiment) | HiRISE (High Resolution Imaging Science Experiment) | ChemCam (Chemistry and Camera) | ChemCam (Chemistry and Camera) | CRISM (Compact Reconnaissance Imaging Spectrometer for Mars)",
+        "answer":  "HiRISE measures high-resolution visible imagery and color products in some modes. It can resolve features down to roughly ~25-30 cm/pixel in optimal conditions.",
+        "sources":  "HiRISE (High Resolution Imaging Science Experiment): NASA || HiRISE (High Resolution Imaging Science Experiment) || HiRISE (High Resolution Imaging Science Experiment): https://hirise.lpl.arizona.edu/ || ChemCam (Chemistry and Camera): NASA || ChemCam (Chemistry and Camera): https://mars.nasa.gov/msl/spacecraft/instruments/chemcam/ || CRISM (Compact Reconnaissance Imaging Spectrometer for Mars): NASA",
+        "notes":  "Generated text grounded in retrieved evidence; verify critical values against sources."
+    },
+    {
+        "n":  20,
+        "q":  "What is CRISM used for?",
+        "status":  "ok",
+        "ms":  17518,
+        "docs":  "CRISM (Compact Reconnaissance Imaging Spectrometer for Mars) | CRISM (Compact Reconnaissance Imaging Spectrometer for Mars) | MARSYN Datasets and Coverage | Mars Environmental Hazards | Human Exploration of Mars | ChemCam (Chemistry and Camera)",
+        "answer":  "CRISM (Compact Reconnaissance Imaging Spectrometer for Mars) is a visible and near-infrared imaging spectrometer on NASA\u0027s Mars Reconnaissance Orbiter (MRO). It is used to identify and map minerals on the Martian surface.",
+        "sources":  "CRISM (Compact Reconnaissance Imaging Spectrometer for Mars): NASA || CRISM (Compact Reconnaissance Imaging Spectrometer for Mars): https://crism.jhuapl.edu/ || MARSYN Datasets and Coverage: https://pds-geosciences.wustl.edu/missions/mgs/mola.html || Mars Environmental Hazards || Human Exploration of Mars: https://www.nasa.gov/humans-in-space/humans-to-mars/ || ChemCam (Chemistry and Camera): NASA",
+        "notes":  "Generated text grounded in retrieved evidence; verify critical values against sources."
+    },
+    {
+        "n":  21,
+        "q":  "What is Gale Crater?",
+        "status":  "ok",
+        "ms":  25484,
+        "docs":  "Gale Crater | Gale Crater | Gale Crater | Gale Crater | Jezero Crater | MOLA Mission Experiment Gridded Data Record (MEGDR)",
+        "answer":  "Gale Crater is a region within the MSL Curiosity landing site, located near the Martian equator in the Aeolis region. It is a large impact crater with a diameter of approximately 154 kilometers, containing a prominent central mound and a layered sedimentary mound. The terrain elevation is from MOLA MEGDR (128 px/degree, ~463 m/pixel) data, with a rim elevation of approximately -1000 to 0 meters and a central mound rising to approximately -4000 meters (approximately +500 meters above crater floor...",
+        "sources":  "Gale Crater || Gale Crater: https://mars.nasa.gov/msl/mission/science/landing-site/ || Gale Crater: NASA || Gale Crater || Jezero Crater: https://mars.nasa.gov/mars2020/mission/science/landing-site/ || MOLA Mission Experiment Gridded Data Record (MEGDR): NASA",
+        "notes":  "Generated text grounded in retrieved evidence; verify critical values against sources."
+    },
+    {
+        "n":  22,
+        "q":  "Why did NASA select Gale Crater for Curiosity?",
+        "status":  "ok",
+        "ms":  11359,
+        "docs":  "Gale Crater | Gale Crater | Gale Crater | Gale Crater",
+        "answer":  "NASA selected Gale Crater for Curiosity because it preserves a long record of Martian environmental history in layered rocks. The crater\u0027s large diameter and depth provide valuable data for studying past environments and conditions, which is crucial for understanding the potential habitability of Gale\u0027s past. The large impact crater\u0027s central mound and the layered sedimentary rocks around it offer insights into the history of water and chemical processes that could have influenced the formation ...",
+        "sources":  "Gale Crater || Gale Crater: NASA || Gale Crater: https://mars.nasa.gov/msl/mission/science/landing-site/ || Gale Crater",
+        "notes":  "Generated text grounded in retrieved evidence; verify critical values against sources."
+    },
+    {
+        "n":  23,
+        "q":  "What is Mount Sharp?",
+        "status":  "ok",
+        "ms":  16672,
+        "docs":  "Mount Sharp (Aeolis Mons) | Mount Sharp (Aeolis Mons) | Mars Science Laboratory (Curiosity Rover) | Gale Crater | Olympus Mons | Mars Science Laboratory (Curiosity Rover)",
+        "answer":  "Mount Sharp is the central mound inside Gale Crater on Mars. It rises about 5 km above the crater floor in its highest areas and contains extensive layered rock sequences.",
+        "sources":  "Mount Sharp (Aeolis Mons): NASA || Mount Sharp (Aeolis Mons): https://mars.nasa.gov/resources/8192/mount-sharp-inside-gale-crater/ || Mars Science Laboratory (Curiosity Rover) || Gale Crater: NASA || Olympus Mons || Mars Science Laboratory (Curiosity Rover)",
+        "notes":  "Generated text grounded in retrieved evidence; verify critical values against sources."
+    },
+    {
+        "n":  24,
+        "q":  "What does MOLA tell us about Gale Crater?",
+        "status":  "ok",
+        "ms":  21805,
+        "docs":  "Gale Crater | Gale Crater | MOLA Mission Experiment Gridded Data Record (MEGDR) | MOLA (Mars Orbiter Laser Altimeter)",
+        "answer":  "MOLA (Mars Orbiter Laser Altimeter) data provides detailed information about the Gale Crater region. Here are the key points about what MOLA tells us about Gale Crater:  1. **Elevation Data**: MOLA elevation data is extracted from the MEGT00N090 tile in the MARSYN project context. The tile covers a region from 137.0 to 138.0 latitude and -5.5 to -4.5 longitude. This data is used to calculate the elevation of the Gale Crater region.  2. **Elevation Scale**: The elevation scale is in metres relati...",
+        "sources":  "Gale Crater || Gale Crater || MOLA Mission Experiment Gridded Data Record (MEGDR): NASA || MOLA (Mars Orbiter Laser Altimeter)",
+        "notes":  "Generated text grounded in retrieved evidence; verify critical values against sources."
+    },
+    {
+        "n":  25,
+        "q":  "What data does MARSYN currently use?",
+        "status":  "ok",
+        "ms":  34508,
+        "docs":  "MARSYN Datasets and Coverage | CRISM (Compact Reconnaissance Imaging Spectrometer for Mars) | HiRISE (High Resolution Imaging Science Experiment) | MOLA (Mars Orbiter Laser Altimeter) | THEMIS (Thermal Emission Imaging System) | Jezero Crater",
+        "answer":  "MARSYN currently uses the following data:  1. **CRISM mineral maps**: These are used for terrain analysis and are not integrated as verified scientific layers. 2. **HiRISE imagery**: This is used for visualizing and analyzing the Martian surface. 3. **THEMIS thermal data**: These are used for thermal analysis and can be used for hazard mapping. 4. **MARSIS/SHARAD radar**: These are used for surface mapping and can be used for hazard mapping. 5. **Hazard maps**: These are used for identifying pot...",
+        "sources":  "MARSYN Datasets and Coverage: https://pds-geosciences.wustl.edu/missions/mgs/mola.html || CRISM (Compact Reconnaissance Imaging Spectrometer for Mars): https://crism.jhuapl.edu/ || HiRISE (High Resolution Imaging Science Experiment) || MOLA (Mars Orbiter Laser Altimeter) || THEMIS (Thermal Emission Imaging System): https://themis.asu.edu/ || Jezero Crater: https://mars.nasa.gov/mars2020/mission/science/landing-site/",
+        "notes":  "Generated text grounded in retrieved evidence; verify critical values against sources."
+    },
+    {
+        "n":  26,
+        "q":  "How does MARSYN calculate a route?",
+        "status":  "ok",
+        "ms":  19780,
+        "docs":  "MARSYN Route Planning | MARSYN Route Planning | MARSYN AI Capabilities and Limitations | MARSYN AI Capabilities and Limitations | MARSYN Project Overview | Mars Environmental Hazards",
+        "answer":  "MARSYN calculates a route using A* pathfinding over the terrain grid. The algorithm considers horizontal distance, slope/gradient constraints, and configured weights (e.g., slope/elevation/hazard-weight parameters). The terrain basis is MOLA-derived elevation grid (Gale Crater extract), and neighbors are 8-connectivity (including diagonals, subject to slope/corner rules in implementation). The cost function includes route cost considering horizontal distance, slope/gradient constraints, and conf...",
+        "sources":  "MARSYN Route Planning || MARSYN Route Planning || MARSYN AI Capabilities and Limitations || MARSYN AI Capabilities and Limitations || MARSYN Project Overview || Mars Environmental Hazards: https://www.nasa.gov/hrp/hazards/",
+        "notes":  "Generated text grounded in retrieved evidence; verify critical values against sources."
+    },
+    {
+        "n":  27,
+        "q":  "Does MARSYN avoid rocks and other hazards?",
+        "status":  "ok",
+        "ms":  11951,
+        "docs":  "Mars Environmental Hazards | MARSYN Route Planning | HiRISE (High Resolution Imaging Science Experiment) | MOLA (Mars Orbiter Laser Altimeter)",
+        "answer":  "Yes, MARSYN avoids rocks and other hazards. It uses a **slope-only terrain model** that does not account for rocks, regolith properties, dust, thermal conditions, radiation, or dynamic hazards. This model is specific to the **Gale Crater** region and is verified for the **MOLA MEGDR** elevation data in the **Gale Crater** region.",
+        "sources":  "Mars Environmental Hazards: https://www.nasa.gov/hrp/hazards/ || MARSYN Route Planning || HiRISE (High Resolution Imaging Science Experiment) || MOLA (Mars Orbiter Laser Altimeter)",
+        "notes":  "Generated text grounded in retrieved evidence; verify critical values against sources."
+    },
+    {
+        "n":  28,
+        "q":  "Does MARSYN have global elevation coverage?",
+        "status":  "ok",
+        "ms":  15163,
+        "docs":  "MARSYN Datasets and Coverage | MARSYN Datasets and Coverage | Marswalk Planning (Conceptual) | MARSYN Project Overview",
+        "answer":  "Yes, MARSYN has global elevation coverage. According to the evidence provided, the MARSYN Datasets and Coverage section states:  - **Coverage (integrated extract):** \"Gale Crater region, lon 137.0â138.0, lat -5.5 to -4.5\" - **Resolution:** \"128 pixels/degree (~463 m/pixel at equator)\" - **Units:** \"Metres elevation relative to the areoid (per dataset metadata)\" - **Format:** \"pr\"  This indicates that the MARSYN application has global elevation coverage, allowing users to explore the Gale Crate...",
+        "sources":  "MARSYN Datasets and Coverage: nasa pds || MARSYN Datasets and Coverage: https://pds-geosciences.wustl.edu/missions/mgs/mola.html || Marswalk Planning (Conceptual): https://www.nasa.gov/suits-and-rovers/extravehicular-activity-eva/ || MARSYN Project Overview",
+        "notes":  "Generated text grounded in retrieved evidence; verify critical values against sources."
+    },
+    {
+        "n":  29,
+        "q":  "Hi.",
+        "status":  "ok",
+        "ms":  3021,
+        "docs":  "",
+        "answer":  "Hello! How can I assist you with your Mars mission?",
+        "sources":  "",
+        "notes":  "Conversational response â no retrieval.; LLM provider used."
+    },
+    {
+        "n":  30,
+        "q":  "Tell me a joke.",
+        "status":  "ok",
+        "ms":  2692,
+        "docs":  "",
+        "answer":  "Why don\u0027t scientists trust atoms?  Because they make up everything!",
+        "sources":  "",
+        "notes":  "Conversational response â no retrieval.; LLM provider used."
+    },
+    {
+        "n":  31,
+        "q":  "How are you?",
+        "status":  "ok",
+        "ms":  3396,
+        "docs":  "",
+        "answer":  "Hello! I\u0027m MARSYN, a Mars mission assistant. I\u0027m here to help answer questions about the Mars mission. How can I assist you today?",
+        "sources":  "",
+        "notes":  "Conversational response â no retrieval.; LLM provider used."
+    }
+]

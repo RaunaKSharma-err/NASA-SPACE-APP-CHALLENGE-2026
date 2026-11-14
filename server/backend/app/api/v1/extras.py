@@ -42,7 +42,8 @@ def assistant(req: AssistantQuery):
     dataset_docs = [
         Document(d.id, d.name,
                  f"Status: {d.status}. Source: {d.authoritative_source}. Coverage: {d.coverage}. "
-                 f"Format: {d.format}. Limitations: {'; '.join(d.limitations) or 'none recorded'}.",
+                 f"Format: {d.format}. Units: {d.units or 'n/a'}. CRS: {d.crs or 'n/a'}. "
+                 f"Limitations: {'; '.join(d.limitations) or 'none recorded'}.",
                  "dataset_metadata")
         for d in load_models(s.metadata_dir / "datasets", DatasetProvenance)
     ]
@@ -53,7 +54,10 @@ def assistant(req: AssistantQuery):
                  "region_metadata")
         for r in load_models(s.metadata_dir / "regions", Region)
     ]
-    docs = dataset_docs + region_docs
+    knowledge_dir = s.metadata_dir.parent / "knowledge"
+    from app.services.ai import load_knowledge_documents
+    knowledge_docs = list(load_knowledge_documents(str(knowledge_dir)))
+    docs = dataset_docs + region_docs + knowledge_docs
     r = answer_query(req.query, docs, get_provider(s.ai_provider))
     return AssistantResponse(status=r.status, answer=r.answer, notes=r.notes,
                              evidence=[EvidenceOut(**e.__dict__) for e in r.evidence])

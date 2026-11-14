@@ -1,0 +1,156 @@
+﻿[
+    {
+        "n":  1,
+        "q":  "Tell me about Mars.",
+        "status":  "ok",
+        "ms":  40879,
+        "docs":  "kb:mars/mars_overview.md#1 | kb:mars/mars_physical_characteristics.md#1 | kb:mars/mars_orbit_rotation_seasons.md#1 | kb:mars/mars_atmosphere_climate.md#1 | kb:mars/mars_surface_geology.md#1 | kb:mars/mars_moons.md#1",
+        "titles":  "Mars Overview | Mars Physical Characteristics | Mars Orbit, Rotation, and Seasons | Mars Atmosphere and Climate | Mars Surface and Geology | Mars Moons: Phobos and Deimos",
+        "answer":  "Mars is the fourth planet from the Sun and a rocky (terrestrial) planet. It is often called the Red Planet because iron oxide (rust) in its surface materials gives it a reddish appearance. The planet is approximately 227.9 million kilometers from the Sun, making it the 8th planet from the Sun in the solar system. Its equatorial diameter is about 6,779 kilometers, and its mean radius is about 3,389.5 kilometers. The planet\u0027s mass is about 6.42 Ã 10^23 kg, which is about 10.7% of Earth\u0027s mass. Its surface gravity is about 3.71 m/sÂ², which is about 38% of Earth\u0027s gravity. The mean density of Mars is about 3.93 g/cmÂ³, which is about 3.93% of Earth\u0027s density. The planet\u0027s length of day is about 24 hours 37 minutes, and its length of year is about 687 Earth days. Mars has two natural satellites, Phobos and Deimos, which are much smaller than Earth\u0027s Moon and have low surface gravity. The planet\u0027s reddish color comes from iron oxide (rust) in its surface materials. The surface of Mars is covered with ancient cratered highlands, volcanic regions, large canyons, and polar ice deposits. The planet\u0027s atmosphere is mostly carbon dioxide, with a small amount of nitrogen and argon. The atmosphere is thin and less",
+        "sources":  "kb:mars/mars_overview.md#1 || kb:mars/mars_physical_characteristics.md#1 || kb:mars/mars_orbit_rotation_seasons.md#1 || kb:mars/mars_atmosphere_climate.md#1 || kb:mars/mars_surface_geology.md#1 || kb:mars/mars_moons.md#1",
+        "notes":  "Generated text grounded in retrieved evidence; verify critical values against sources."
+    },
+    {
+        "n":  2,
+        "q":  "How big is Mars?",
+        "status":  "ok",
+        "ms":  25,
+        "docs":  "kb:mars/mars_physical_characteristics.md#1 | kb:mars/mars_physical_characteristics.md#2",
+        "titles":  "Mars Physical Characteristics | Mars Physical Characteristics",
+        "answer":  "Mars has an approximate mean diameter of 6,779 km (4,212 miles) [kb:mars/mars_physical_characteristics.md]. - Equatorial diameter: ~6,779 km - Mean radius: ~3,389.5 km Values are approximate reference figures.",
+        "sources":  "kb:mars/mars_physical_characteristics.md#1 || kb:mars/mars_physical_characteristics.md#2: https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html",
+        "notes":  "Deterministic answer from curated Mars physical characteristics knowledge (not model-generated)."
+    },
+    {
+        "n":  3,
+        "q":  "How long is a day on Mars?",
+        "status":  "ok",
+        "ms":  21,
+        "docs":  "kb:mars/mars_orbit_rotation_seasons.md#1 | kb:mars/mars_orbit_rotation_seasons.md#2",
+        "titles":  "Mars Orbit, Rotation, and Seasons | Mars Orbit, Rotation, and Seasons",
+        "answer":  "A Martian solar day (sol) is approximately 24 hours, 39 minutes, and 35 seconds [kb:mars/mars_orbit_rotation_seasons.md]. - This is slightly longer than an Earth day. - The difference is due to Mars\u0027s rotation period on its axis (how long it takes Mars to rotate relative to the Sun), not because of its atmosphere or magnetic field.",
+        "sources":  "kb:mars/mars_orbit_rotation_seasons.md#1 || kb:mars/mars_orbit_rotation_seasons.md#2: https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html",
+        "notes":  "Deterministic answer from curated Mars rotation/orbit knowledge (not model-generated)."
+    },
+    {
+        "n":  4,
+        "q":  "What is the atmosphere of Mars made of?",
+        "status":  "ok",
+        "ms":  12014,
+        "docs":  "kb:mars/mars_atmosphere_climate.md#1 | kb:human_exploration/mars_environmental_hazards.md#1 | kb:human_exploration/mars_human_exploration.md#3 | kb:instruments/sam_instrument.md#1",
+        "titles":  "Mars Atmosphere and Climate | Mars Environmental Hazards | Human Exploration of Mars | SAM (Sample Analysis at Mars)",
+        "answer":  "The atmosphere of Mars is primarily composed of carbon dioxide (CO2), with trace amounts of nitrogen (N2), argon (Ar), oxygen (O2), carbon monoxide (CO), and water vapor. The exact composition can vary slightly depending on the specific location and time of observation.",
+        "sources":  "kb:mars/mars_atmosphere_climate.md#1 || kb:human_exploration/mars_environmental_hazards.md#1 || kb:human_exploration/mars_human_exploration.md#3: https://www.nasa.gov/humans-in-space/humans-to-mars/ || kb:instruments/sam_instrument.md#1",
+        "notes":  "Generated text grounded in retrieved evidence; verify critical values against sources."
+    },
+    {
+        "n":  5,
+        "q":  "What data does MARSYN currently use?",
+        "status":  "ok",
+        "ms":  21,
+        "docs":  "mola-megdr | gale-crater | kb:marsyn/marsyn_datasets.md#1 | kb:marsyn/marsyn_datasets.md#2",
+        "titles":  "MOLA Mission Experiment Gridded Data Record (MEGDR) | Gale Crater | MARSYN Datasets and Coverage | MARSYN Datasets and Coverage",
+        "answer":  "MARSYN currently uses the following verified integrated scientific dataset(s): - MOLA Mission Experiment Gridded Data Record (MEGDR) (id: mola-megdr)  Project facts (registry-backed): - Verified integrated scientific terrain dataset: MOLA MEGDR elevation data only. - Integrated terrain coverage: Gale Crater region only (lon 137.0â138.0, lat -5.5 to -4.5) per integrated MOLA extract metadata. - 8K Mars globe texture: visual-only asset with unverified provenance (not a scientific dataset; not used for elevation/slope/routing). - CRISM, HiRISE, THEMIS, MARSIS, and SHARAD: not integrated as verified scientific datasets/layers in the current build (knowledge references or UI/fixture concepts only). - No verified hazard map dataset is integrated. - Route planning calculates one primary terrain-aware route (not multiple independent alternatives). Knowledge-base documents are reference material and are not integrated scientific datasets.",
+        "sources":  "mola-megdr || gale-crater || kb:marsyn/marsyn_datasets.md#1 || kb:marsyn/marsyn_datasets.md#2: https://pds-geosciences.wustl.edu/missions/mgs/mola.html",
+        "notes":  "Deterministic, registry-backed MARSYN dataset/project-fact answer."
+    },
+    {
+        "n":  6,
+        "q":  "Does MARSYN use CRISM?",
+        "status":  "ok",
+        "ms":  24,
+        "docs":  "mola-megdr | gale-crater | kb:marsyn/marsyn_datasets.md#1 | kb:marsyn/marsyn_datasets.md#2",
+        "titles":  "MOLA Mission Experiment Gridded Data Record (MEGDR) | Gale Crater | MARSYN Datasets and Coverage | MARSYN Datasets and Coverage",
+        "answer":  "No. MARSYN does not currently use CRISM as an integrated verified scientific dataset or map layer. - CRISM may appear as a knowledge reference or placeholder/fixture concept, but no CRISM measurements are integrated. - Verified integrated scientific terrain dataset: MOLA MEGDR only (mola-megdr). - Coverage: Gale Crater region only (lon 137.0â138.0, lat -5.5 to -4.5) per integrated MOLA extract metadata.",
+        "sources":  "mola-megdr || gale-crater || kb:marsyn/marsyn_datasets.md#1 || kb:marsyn/marsyn_datasets.md#2: https://pds-geosciences.wustl.edu/missions/mgs/mola.html",
+        "notes":  "Deterministic project-fact answer (registry-backed)."
+    },
+    {
+        "n":  7,
+        "q":  "Does MARSYN use HiRISE?",
+        "status":  "ok",
+        "ms":  21,
+        "docs":  "mola-megdr | gale-crater | kb:marsyn/marsyn_datasets.md#1 | kb:marsyn/marsyn_datasets.md#2",
+        "titles":  "MOLA Mission Experiment Gridded Data Record (MEGDR) | Gale Crater | MARSYN Datasets and Coverage | MARSYN Datasets and Coverage",
+        "answer":  "No. MARSYN does not currently use HiRISE as an integrated verified scientific dataset or imagery layer. - HiRISE may appear as a knowledge reference or placeholder/fixture concept, but no HiRISE data is integrated. - Verified integrated scientific terrain dataset: MOLA MEGDR only (mola-megdr). - Coverage: Gale Crater region only (lon 137.0â138.0, lat -5.5 to -4.5) per integrated MOLA extract metadata.",
+        "sources":  "mola-megdr || gale-crater || kb:marsyn/marsyn_datasets.md#1 || kb:marsyn/marsyn_datasets.md#2: https://pds-geosciences.wustl.edu/missions/mgs/mola.html",
+        "notes":  "Deterministic project-fact answer (registry-backed)."
+    },
+    {
+        "n":  8,
+        "q":  "Does MARSYN avoid rocks?",
+        "status":  "ok",
+        "ms":  28,
+        "docs":  "mola-megdr | gale-crater | kb:marsyn/marsyn_datasets.md#1 | kb:marsyn/marsyn_datasets.md#2",
+        "titles":  "MOLA Mission Experiment Gridded Data Record (MEGDR) | Gale Crater | MARSYN Datasets and Coverage | MARSYN Datasets and Coverage",
+        "answer":  "No. MARSYN does not avoid rocks or other fine-scale/operational hazards. - Routing is terrain-aware A* over MOLA elevation with slope/elevation-based costs and NoData handling. - It does not model rocks, boulders, regolith bearing strength, dust, radiation, weather, or rover-scale obstacles. - MOLA resolution in the integrated extract is ~463 m/pixel, which is too coarse for rover-scale hazard avoidance. Results are planning aids, not certified safety or navigation guidance.",
+        "sources":  "mola-megdr || gale-crater || kb:marsyn/marsyn_datasets.md#1 || kb:marsyn/marsyn_datasets.md#2: https://pds-geosciences.wustl.edu/missions/mgs/mola.html",
+        "notes":  "Deterministic project-fact answer."
+    },
+    {
+        "n":  9,
+        "q":  "Does MARSYN have global elevation coverage?",
+        "status":  "ok",
+        "ms":  21,
+        "docs":  "mola-megdr | gale-crater | kb:marsyn/marsyn_datasets.md#1 | kb:marsyn/marsyn_datasets.md#2",
+        "titles":  "MOLA Mission Experiment Gridded Data Record (MEGDR) | Gale Crater | MARSYN Datasets and Coverage | MARSYN Datasets and Coverage",
+        "answer":  "No. MARSYN does not have global Mars elevation coverage. - Integrated terrain coverage is limited to the Gale Crater regional extract: Gale Crater region only (lon 137.0â138.0, lat -5.5 to -4.5) per integrated MOLA extract metadata. - Verified integrated scientific terrain dataset: MOLA MEGDR only (mola-megdr), ~463 m/pixel resolution.",
+        "sources":  "mola-megdr || gale-crater || kb:marsyn/marsyn_datasets.md#1 || kb:marsyn/marsyn_datasets.md#2: https://pds-geosciences.wustl.edu/missions/mgs/mola.html",
+        "notes":  "Deterministic project-fact answer (registry-backed)."
+    },
+    {
+        "n":  10,
+        "q":  "How many routes does MARSYN calculate?",
+        "status":  "ok",
+        "ms":  35,
+        "docs":  "mola-megdr | gale-crater | kb:marsyn/marsyn_datasets.md#1 | kb:marsyn/marsyn_datasets.md#2",
+        "titles":  "MOLA Mission Experiment Gridded Data Record (MEGDR) | Gale Crater | MARSYN Datasets and Coverage | MARSYN Datasets and Coverage",
+        "answer":  "MARSYN calculates one primary terrain-aware route per request (not multiple independent route alternatives). - The route is computed by backend A* pathfinding over the integrated MOLA elevation grid with slope/elevation costs. - Returned waypoints, distance, and slope metrics describe that calculated route.",
+        "sources":  "mola-megdr || gale-crater || kb:marsyn/marsyn_datasets.md#1 || kb:marsyn/marsyn_datasets.md#2: https://pds-geosciences.wustl.edu/missions/mgs/mola.html",
+        "notes":  "Deterministic project-fact answer."
+    },
+    {
+        "n":  11,
+        "q":  "What is MOLA?",
+        "status":  "ok",
+        "ms":  20625,
+        "docs":  "kb:mars/mars_overview.md#1 | kb:mars/mars_overview.md#2 | kb:mars/mars_atmosphere_climate.md#1 | kb:mars/mars_moons.md#1 | kb:mars/mars_orbit_rotation_seasons.md#1 | kb:mars/mars_physical_characteristics.md#1",
+        "titles":  "Mars Overview | Mars Overview | Mars Atmosphere and Climate | Mars Moons: Phobos and Deimos | Mars Orbit, Rotation, and Seasons | Mars Physical Characteristics",
+        "answer":  "MOLA (Mars Orbiter Laser Altimeter) is a NASA Marsæ¢æµå¨ï¼å®æ¯ä¸ä¸ªç¨äºæ¢æµååæç«æè¡¨é¢çæ¿å\u0085é·è¾¾ç³»ç»ã",
+        "sources":  "kb:mars/mars_overview.md#1 || kb:mars/mars_overview.md#2 || kb:mars/mars_atmosphere_climate.md#1 || kb:mars/mars_moons.md#1 || kb:mars/mars_orbit_rotation_seasons.md#1 || kb:mars/mars_physical_characteristics.md#1",
+        "notes":  "Generated text grounded in retrieved evidence; verify critical values against sources."
+    },
+    {
+        "n":  12,
+        "q":  "What is Gale Crater?",
+        "status":  "ok",
+        "ms":  18915,
+        "docs":  "kb:mars/mars_overview.md#1 | kb:mars/mars_overview.md#2 | gale-crater | kb:locations/gale_crater.md#3 | kb:mars/mars_moons.md#1 | kb:locations/gale_crater.md#1",
+        "titles":  "Mars Overview | Mars Overview | Gale Crater | Gale Crater | Mars Moons: Phobos and Deimos | Gale Crater",
+        "answer":  "Gale Crater is a region on Mars that contains the landing site of NASA\u0027s Curiosity rover. It is a 154-km diameter impact crater that is part of the MSL (Mars Science Laboratory) mission. The crater is located near the Martian equator in the Aeolis region, and it is named after the Gale crater on Earth. The crater is named after the American astronomer and geologist Carl Sagan, who was a key figure in the Mars exploration program. The Gale Crater is considered a key location for Mars exploration due to its limited coverage and the potential for future missions to study its geological history and potential for water-related processes.",
+        "sources":  "kb:mars/mars_overview.md#1 || kb:mars/mars_overview.md#2 || gale-crater || kb:locations/gale_crater.md#3: https://mars.nasa.gov/msl/mission/science/landing-site/ || kb:mars/mars_moons.md#1 || kb:locations/gale_crater.md#1",
+        "notes":  "Generated text grounded in retrieved evidence; verify critical values against sources."
+    },
+    {
+        "n":  13,
+        "q":  "Tell me a joke.",
+        "status":  "ok",
+        "ms":  3523,
+        "docs":  "",
+        "titles":  "",
+        "answer":  "Sure, here\u0027s a joke for you:  Why don\u0027t scientists trust atoms?  Because they make up everything!",
+        "sources":  "",
+        "notes":  "Conversational response â no retrieval.; LLM provider used."
+    },
+    {
+        "n":  14,
+        "q":  "Hi.",
+        "status":  "ok",
+        "ms":  2632,
+        "docs":  "",
+        "titles":  "",
+        "answer":  "Hello! How can I assist you with your Mars mission?",
+        "sources":  "",
+        "notes":  "Conversational response â no retrieval.; LLM provider used."
+    }
+]

@@ -57,7 +57,7 @@ class Api(unittest.TestCase):
         self.assertEqual(post(action="sync")["synced"], 1)
 
     def test_assistant_no_evidence(self):
-        r = self.c.post("/api/v1/assistant/query", json={"query": "anything at all"})
+        r = self.c.post("/api/v1/assistant/query", json={"query": "xyzzy quux foobar nonexistent"})
         self.assertEqual(r.json()["status"], "no_evidence")
 
     def test_assistant_short_query_accepted(self):

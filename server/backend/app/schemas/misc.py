@@ -19,6 +19,8 @@ class EvidenceOut(BaseModel):
     kind: str
     snippet: str
     score: int
+    source_url: str | None = None
+    source_org: str | None = None
 
 
 class AssistantResponse(BaseModel):
