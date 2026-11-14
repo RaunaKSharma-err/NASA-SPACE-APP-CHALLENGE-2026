@@ -9,7 +9,7 @@ class Settings(BaseSettings):
 
     app_name: str = "Mars Explorer API"
     environment: str = "development"
-    cors_origins: list[str] = ["http://localhost:5173"]  # Vite default
+    cors_origins: list[str] = ["http://localhost:5173","https://nasa-space-app-challenge-2026.vercel.app/"]  # Vite default
     database_url: str = "sqlite:///./mars.db"  # reserved; unused until models exist
     metadata_dir: Path = Path("../data/metadata")
     processed_dir: Path = Path("../data/processed")  # <region_id>/manifest.json packages
