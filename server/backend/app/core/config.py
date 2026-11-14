@@ -25,6 +25,8 @@ class Settings(BaseSettings):
     openrouter_api_key: str = ""
     openrouter_model: str = "openai/gpt-4o-mini"
     openrouter_timeout: int = 30
+    openrouter_site_url: str = ""
+    openrouter_app_name: str = "MARSYN"
     # Remote scientific data provider (opt-in, disabled until configured).
     # No NASA URLs are hardcoded; these are supplied via environment variables
     # only when official NASA resource documentation is available.

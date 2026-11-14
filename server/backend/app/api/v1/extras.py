@@ -6,6 +6,7 @@ from app.core.config import get_settings
 from app.core.errors import AppError
 from app.schemas.datasets import DatasetProvenance, Region
 from app.schemas.misc import (
+    AssistantProviderStatus,
     AssistantQuery,
     AssistantResponse,
     EvidenceOut,
@@ -13,7 +14,7 @@ from app.schemas.misc import (
     OfflinePackage,
     SyncRequest,
 )
-from app.services.ai import Document, answer_query, get_provider
+from app.services.ai import Document, answer_query, get_provider, get_provider_status, load_knowledge_documents
 from app.services.offline import SimulatedRelay, verify_manifest
 from app.services.registry import load_models
 
@@ -55,12 +56,35 @@ def assistant(req: AssistantQuery):
         for r in load_models(s.metadata_dir / "regions", Region)
     ]
     knowledge_dir = s.metadata_dir.parent / "knowledge"
-    from app.services.ai import load_knowledge_documents
     knowledge_docs = list(load_knowledge_documents(str(knowledge_dir)))
     docs = dataset_docs + region_docs + knowledge_docs
     r = answer_query(req.query, docs, get_provider(s.ai_provider))
-    return AssistantResponse(status=r.status, answer=r.answer, notes=r.notes,
-                             evidence=[EvidenceOut(**e.__dict__) for e in r.evidence])
+    return AssistantResponse(
+        status=r.status,
+        answer=r.answer,
+        notes=r.notes,
+        evidence=[EvidenceOut(**e.__dict__) for e in r.evidence],
+        provider=r.provider,
+        provider_label=r.provider_label,
+        provider_mode=r.provider_mode,
+        model=r.model,
+        generation=r.generation,
+        provider_error=r.provider_error,
+    )
+
+
+@router.get("/assistant/provider", response_model=AssistantProviderStatus)
+def assistant_provider_status():
+    st = get_provider_status()
+    return AssistantProviderStatus(
+        provider=st.provider,
+        provider_label=st.provider_label,
+        provider_mode=st.provider_mode,
+        model=st.model,
+        available=st.available,
+        configured=st.configured,
+        reason=st.reason,
+    )
 
 
 @router.get("/offline/regions", response_model=list[OfflinePackage])

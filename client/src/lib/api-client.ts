@@ -7,11 +7,13 @@ import type {
   RouteResult,
   AssistantRequest,
   AssistantMessage,
+  AssistantProviderStatus,
   RegionId,
   LayerType,
   LayerSource,
   BackendRouteResponse,
   BackendAssistantResponse,
+  BackendAssistantProviderStatus,
   BackendObservationsResponse,
   BackendOfflinePackage,
   BackendSyncResponse,
@@ -74,6 +76,10 @@ function backendToAssistantMessage(resp: BackendAssistantResponse): AssistantMes
     || resp.notes.join(' ')
     || 'No answer available.';
   const evidence = resp.evidence.map((e) => `${e.title}: ${e.snippet}`);
+  const provider = resp.provider as AssistantMessage['provider'] | undefined;
+  const providerLabel = resp.provider_label || undefined;
+  const providerMode = resp.provider_mode as AssistantMessage['providerMode'] | undefined;
+  const isUnavailable = resp.status === 'provider_unavailable';
   return {
     id: `msg-${Date.now()}`,
     role: 'assistant',
@@ -81,8 +87,14 @@ function backendToAssistantMessage(resp: BackendAssistantResponse): AssistantMes
     timestamp: Date.now(),
     evidence,
     sources: resp.evidence.map((e) => e.title),
-    uncertainty: resp.status === 'ok' ? 'low' : resp.status === 'provider_unavailable' ? 'high' : 'medium',
-    provider: 'live',
+    uncertainty: resp.status === 'ok' ? (resp.generation === 'model' ? 'low' : 'medium') : 'high',
+    provider: provider || (isUnavailable ? 'none' : 'live'),
+    providerLabel,
+    providerMode,
+    model: resp.model ?? null,
+    generation: resp.generation ?? (resp.status === 'ok' ? 'model' : 'none'),
+    providerError: resp.provider_error ?? (isUnavailable ? (resp.notes[0] || 'AI provider unavailable') : null),
+    error: isUnavailable,
   };
 }
 
@@ -249,6 +261,39 @@ export const apiClient = {
     return [primary];
   },
 
+  // ------------------------------------------------------------------ AI assistant provider API
+
+  async getAssistantProviderStatus(): Promise<AssistantProviderStatus> {
+    try {
+      const response = await fetchWithTimeout(`${this.baseUrl}/assistant/provider`, undefined, 5000);
+      if (!response.ok) throw new Error(`Assistant provider status failed: ${response.status}`);
+      const data = (await response.json()) as BackendAssistantProviderStatus;
+      return {
+        provider: (data.provider as AssistantProviderStatus['provider']) || 'none',
+        providerLabel: data.provider_label || 'AI Provider Unavailable',
+        providerMode: (data.provider_mode as AssistantProviderStatus['providerMode']) || 'none',
+        model: data.model ?? null,
+        available: !!data.available,
+        configured: !!data.configured,
+        reason: data.reason ?? null,
+      };
+    } catch {
+      return {
+        provider: 'none',
+        providerLabel: 'AI Provider Unavailable',
+        providerMode: 'none',
+        model: null,
+        available: false,
+        configured: false,
+        reason: 'Backend assistant provider status unavailable',
+      };
+    }
+  },
+
+  async checkAssistantProviderHealth(): Promise<AssistantProviderStatus> {
+    return this.getAssistantProviderStatus();
+  },
+
   async queryAssistant(request: AssistantRequest): Promise<AssistantMessage> {
     try {
       const response = await fetchWithTimeout(
@@ -276,7 +321,12 @@ export const apiClient = {
         sources: result.sources,
         uncertainty: result.uncertainty,
         provider: 'mock',
-        error: isNetworkError,
+        providerLabel: 'Mock · Demo fallback',
+        providerMode: 'mock',
+        model: null,
+        generation: 'fallback',
+        providerError: isNetworkError ? 'Backend unreachable' : 'Backend request failed',
+        error: true,
       };
     }
   },
@@ -304,7 +354,7 @@ export const apiClient = {
     }
   },
 
-  // ------------------------------------------------------------------ provider API
+  // ------------------------------------------------------------------ scientific data provider API (separate from AI assistant providers)
 
   async checkProviderHealth(): Promise<{
     localEnabled: boolean;

@@ -95,7 +95,9 @@ export interface RouteRequest {
   hazardWeight?: number;
 }
 
-export type AssistantProvider = 'live' | 'mock' | 'unavailable';
+export type AssistantProvider = 'openrouter' | 'ollama' | 'none' | 'live' | 'mock' | 'unavailable';
+export type AssistantProviderMode = 'online' | 'offline' | 'none' | 'mock';
+export type AssistantGeneration = 'model' | 'deterministic' | 'fallback' | 'none';
 
 export interface AssistantMessage {
   id: string;
@@ -107,6 +109,21 @@ export interface AssistantMessage {
   uncertainty?: 'low' | 'medium' | 'high';
   error?: boolean;
   provider?: AssistantProvider;
+  providerLabel?: string;
+  providerMode?: AssistantProviderMode;
+  model?: string | null;
+  generation?: AssistantGeneration;
+  providerError?: string | null;
+}
+
+export interface AssistantProviderStatus {
+  provider: AssistantProvider;
+  providerLabel: string;
+  providerMode: AssistantProviderMode;
+  model?: string | null;
+  available: boolean;
+  configured: boolean;
+  reason?: string | null;
 }
 
 export interface AssistantRequest {
@@ -210,8 +227,24 @@ export interface BackendRouteResponse {
 export interface BackendAssistantResponse {
   status: 'ok' | 'no_evidence' | 'provider_unavailable';
   answer: string | null;
-  evidence: Array<{ doc_id: string; title: string; kind: string; snippet: string; score: number }>;
+  evidence: Array<{ doc_id: string; title: string; kind: string; snippet: string; score: number; source_url?: string | null; source_org?: string | null }>;
   notes: string[];
+  provider?: 'openrouter' | 'ollama' | 'none' | string | null;
+  provider_label?: string | null;
+  provider_mode?: 'online' | 'offline' | 'none' | null;
+  model?: string | null;
+  generation?: 'model' | 'deterministic' | 'fallback' | 'none' | null;
+  provider_error?: string | null;
+}
+
+export interface BackendAssistantProviderStatus {
+  provider: 'openrouter' | 'ollama' | 'none' | string;
+  provider_label: string;
+  provider_mode: 'online' | 'offline' | 'none';
+  model?: string | null;
+  available: boolean;
+  configured: boolean;
+  reason?: string | null;
 }
 
 export interface BackendObservationsResponse {

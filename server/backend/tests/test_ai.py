@@ -1,6 +1,9 @@
 """Retrieval and assistant behaviour on SYNTHETIC documents."""
+import io
 import json
+import os
 import unittest
+import urllib.error
 from unittest.mock import MagicMock, patch
 
 from app.services.ai import (
@@ -11,6 +14,7 @@ from app.services.ai import (
     ProviderUnavailable,
     answer_query,
     get_provider,
+    get_provider_status,
     retrieve,
 )
 
@@ -336,8 +340,33 @@ class OllamaProviderTests(unittest.TestCase):
 class OpenRouterProviderTests(unittest.TestCase):
     def test_no_api_key(self):
         provider = OpenRouterProvider("", "openai/gpt-4o-mini", timeout=10)
-        with self.assertRaises(ProviderUnavailable):
+        with self.assertRaises(ProviderUnavailable) as ctx:
             provider.complete("test prompt")
+        self.assertIn("API key", str(ctx.exception))
+
+    def test_request_construction_headers_model_and_body(self):
+        provider = OpenRouterProvider(
+            "test-key", "openai/gpt-4o-mini", timeout=10,
+            site_url="https://example.test", app_name="MARSYN-Test",
+        )
+        mock_resp = MagicMock()
+        mock_resp.read.return_value = json.dumps({
+            "choices": [{"message": {"content": "Cloud answer."}}]
+        }).encode()
+        mock_resp.__enter__ = lambda s: s
+        mock_resp.__exit__ = lambda s, *a: None
+        with patch("urllib.request.urlopen", return_value=mock_resp) as m:
+            result = provider.complete("test prompt")
+        self.assertEqual(result, "Cloud answer.")
+        req = m.call_args[0][0]
+        self.assertEqual(req.full_url, "https://openrouter.ai/api/v1/chat/completions")
+        self.assertEqual(req.headers.get("Authorization"), "Bearer test-key")
+        self.assertEqual(req.headers.get("Content-type"), "application/json")
+        self.assertEqual(req.headers.get("Http-referer"), "https://example.test")
+        self.assertEqual(req.headers.get("X-title"), "MARSYN-Test")
+        body = json.loads(req.data.decode("utf-8"))
+        self.assertEqual(body["model"], "openai/gpt-4o-mini")
+        self.assertEqual(body["messages"], [{"role": "user", "content": "test prompt"}])
 
     def test_complete_success(self):
         provider = OpenRouterProvider("test-key", "openai/gpt-4o-mini", timeout=10)
@@ -351,46 +380,224 @@ class OpenRouterProviderTests(unittest.TestCase):
             result = provider.complete("test prompt")
         self.assertEqual(result, "Cloud answer.")
 
+    def test_timeout_handling(self):
+        provider = OpenRouterProvider("test-key", "openai/gpt-4o-mini", timeout=10)
+        with patch("urllib.request.urlopen", side_effect=TimeoutError("timed out")):
+            with self.assertRaises(ProviderUnavailable) as ctx:
+                provider.complete("test prompt")
+        self.assertIn("timed out", str(ctx.exception).lower())
+
+    def test_http_401_handling(self):
+        provider = OpenRouterProvider("bad-key", "openai/gpt-4o-mini", timeout=10)
+        err = urllib.error.HTTPError(provider_complete_url(), 401, "Unauthorized", {}, io.BytesIO(b""))
+        with patch("urllib.request.urlopen", side_effect=err):
+            with self.assertRaises(ProviderUnavailable) as ctx:
+                provider.complete("test prompt")
+        self.assertIn("authentication", str(ctx.exception).lower())
+
+    def test_http_429_handling(self):
+        provider = OpenRouterProvider("test-key", "openai/gpt-4o-mini", timeout=10)
+        err = urllib.error.HTTPError(provider_complete_url(), 429, "Too Many Requests", {}, io.BytesIO(b""))
+        with patch("urllib.request.urlopen", side_effect=err):
+            with self.assertRaises(ProviderUnavailable) as ctx:
+                provider.complete("test prompt")
+        self.assertIn("rate", str(ctx.exception).lower())
+
+    def test_http_500_handling(self):
+        provider = OpenRouterProvider("test-key", "openai/gpt-4o-mini", timeout=10)
+        err = urllib.error.HTTPError(provider_complete_url(), 500, "Server Error", {}, io.BytesIO(b""))
+        with patch("urllib.request.urlopen", side_effect=err):
+            with self.assertRaises(ProviderUnavailable) as ctx:
+                provider.complete("test prompt")
+        self.assertIn("service", str(ctx.exception).lower())
+
+    def test_invalid_json_response(self):
+        provider = OpenRouterProvider("test-key", "openai/gpt-4o-mini", timeout=10)
+        mock_resp = MagicMock()
+        mock_resp.read.return_value = b"not json"
+        mock_resp.__enter__ = lambda s: s
+        mock_resp.__exit__ = lambda s, *a: None
+        with patch("urllib.request.urlopen", return_value=mock_resp):
+            with self.assertRaises(ProviderUnavailable) as ctx:
+                provider.complete("test prompt")
+        self.assertIn("invalid", str(ctx.exception).lower())
+
+    def test_empty_choices_response(self):
+        provider = OpenRouterProvider("test-key", "openai/gpt-4o-mini", timeout=10)
+        mock_resp = MagicMock()
+        mock_resp.read.return_value = json.dumps({"choices": []}).encode()
+        mock_resp.__enter__ = lambda s: s
+        mock_resp.__exit__ = lambda s, *a: None
+        with patch("urllib.request.urlopen", return_value=mock_resp):
+            with self.assertRaises(ProviderUnavailable):
+                provider.complete("test prompt")
+
+    def test_empty_message_response(self):
+        provider = OpenRouterProvider("test-key", "openai/gpt-4o-mini", timeout=10)
+        mock_resp = MagicMock()
+        mock_resp.read.return_value = json.dumps({"choices": [{"message": {"content": "   "}}]}).encode()
+        mock_resp.__enter__ = lambda s: s
+        mock_resp.__exit__ = lambda s, *a: None
+        with patch("urllib.request.urlopen", return_value=mock_resp):
+            with self.assertRaises(ProviderUnavailable):
+                provider.complete("test prompt")
+
     def test_complete_connection_error(self):
         provider = OpenRouterProvider("test-key", "openai/gpt-4o-mini", timeout=10)
-        with patch("urllib.request.urlopen", side_effect=ConnectionError("refused")), self.assertRaises(ProviderUnavailable):
+        with patch("urllib.request.urlopen", side_effect=urllib.error.URLError("refused")), self.assertRaises(ProviderUnavailable):
             provider.complete("test prompt")
 
 
+def provider_complete_url():
+    return "https://openrouter.ai/api/v1/chat/completions"
+
+
 class GetProviderTests(unittest.TestCase):
-    def test_none_returns_null(self):
+    def setUp(self):
         from app.core.config import get_settings
+        self._orig = {k: os.environ.get(k) for k in [
+            "MARS_AI_PROVIDER", "MARS_OPENROUTER_API_KEY", "MARS_OPENROUTER_MODEL",
+            "MARS_OLLAMA_URL", "MARS_OLLAMA_MODEL",
+        ]}
         get_settings.cache_clear()
-        import os
+
+    def tearDown(self):
+        from app.core.config import get_settings
+        for k, v in self._orig.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
+        get_settings.cache_clear()
+
+    def test_none_returns_null(self):
         os.environ["MARS_AI_PROVIDER"] = "none"
-        get_settings.cache_clear()
-        p = get_provider("none")
+        p = get_provider()
         self.assertIsInstance(p, NullProvider)
+        self.assertEqual(p.provider_id, "none")
 
     def test_ollama_returns_ollama_provider(self):
-        from app.core.config import get_settings
-        get_settings.cache_clear()
-        import os
         os.environ["MARS_AI_PROVIDER"] = "ollama"
-        get_settings.cache_clear()
-        p = get_provider("ollama")
+        os.environ["MARS_OLLAMA_MODEL"] = "qwen2.5:0.5b"
+        p = get_provider()
         self.assertIsInstance(p, OllamaProvider)
         self.assertEqual(p.model, "qwen2.5:0.5b")
+        self.assertEqual(p.provider_mode, "offline")
 
     def test_openrouter_without_key_returns_null(self):
-        from app.core.config import get_settings
-        get_settings.cache_clear()
-        import os
         os.environ["MARS_AI_PROVIDER"] = "openrouter"
         os.environ["MARS_OPENROUTER_API_KEY"] = ""
-        get_settings.cache_clear()
-        p = get_provider("openrouter")
+        os.environ["MARS_OPENROUTER_MODEL"] = "openai/gpt-4o-mini"
+        p = get_provider()
         self.assertIsInstance(p, NullProvider)
+        self.assertIn("key", p.reason.lower())
+
+    def test_openrouter_with_key_returns_provider(self):
+        os.environ["MARS_AI_PROVIDER"] = "openrouter"
+        os.environ["MARS_OPENROUTER_API_KEY"] = "test-key"
+        os.environ["MARS_OPENROUTER_MODEL"] = "openai/gpt-4o-mini"
+        p = get_provider()
+        self.assertIsInstance(p, OpenRouterProvider)
+        self.assertEqual(p.model, "openai/gpt-4o-mini")
+        self.assertEqual(p.provider_mode, "online")
 
     def test_unknown_returns_null(self):
-        p = get_provider("unknown")
+        os.environ["MARS_AI_PROVIDER"] = "unknown-provider"
+        p = get_provider()
         self.assertIsInstance(p, NullProvider)
 
+    def test_provider_selection_follows_env_no_auto_switch(self):
+        os.environ["MARS_AI_PROVIDER"] = "openrouter"
+        os.environ["MARS_OPENROUTER_API_KEY"] = ""
+        p = get_provider()
+        self.assertIsInstance(p, NullProvider)
+        self.assertNotIsInstance(p, OllamaProvider)
 
-if __name__ == "__main__":
-    unittest.main()
+    def test_provider_status_ollama(self):
+        os.environ["MARS_AI_PROVIDER"] = "ollama"
+        st = get_provider_status()
+        self.assertEqual(st.provider, "ollama")
+        self.assertTrue(st.available)
+        self.assertEqual(st.provider_mode, "offline")
+
+    def test_provider_status_openrouter_missing_key(self):
+        os.environ["MARS_AI_PROVIDER"] = "openrouter"
+        os.environ["MARS_OPENROUTER_API_KEY"] = ""
+        st = get_provider_status()
+        self.assertEqual(st.provider, "openrouter")
+        self.assertFalse(st.available)
+        self.assertTrue(st.configured)
+        self.assertIn("key", (st.reason or "").lower())
+
+    def test_provider_status_openrouter_configured(self):
+        os.environ["MARS_AI_PROVIDER"] = "openrouter"
+        os.environ["MARS_OPENROUTER_API_KEY"] = "test-key"
+        os.environ["MARS_OPENROUTER_MODEL"] = "openai/gpt-4o-mini"
+        st = get_provider_status()
+        self.assertEqual(st.provider, "openrouter")
+        self.assertTrue(st.available)
+        self.assertEqual(st.provider_mode, "online")
+
+
+class ProviderDualModeBehavior(unittest.TestCase):
+    """Deterministic answers and retrieval/evidence must work regardless of selected provider."""
+
+    class OpenRouterLike:
+        provider_id = "openrouter"
+        provider_label = "OpenRouter · Online AI"
+        provider_mode = "online"
+        model = "openai/gpt-4o-mini"
+
+        def complete(self, prompt):
+            assert "EVIDENCE" in prompt
+            return "grounded openrouter answer"
+
+    class OllamaLike:
+        provider_id = "ollama"
+        provider_label = "Ollama · Local AI"
+        provider_mode = "offline"
+        model = "qwen2.5:0.5b"
+
+        def complete(self, prompt):
+            assert "EVIDENCE" in prompt
+            return "grounded ollama answer"
+
+    def test_deterministic_independent_of_provider(self):
+        for p in (self.OpenRouterLike(), self.OllamaLike(), NullProvider()):
+            r = answer_query("How big is Mars?", DOCS, p)
+            self.assertEqual(r.status, "ok")
+            self.assertEqual(r.generation, "deterministic")
+            self.assertIn("6,779 km", r.answer)
+
+    def test_retrieval_and_evidence_with_openrouter(self):
+        r = answer_query("elevation units", DOCS, self.OpenRouterLike())
+        self.assertEqual(r.status, "ok")
+        self.assertEqual(r.answer, "grounded openrouter answer")
+        self.assertGreater(len(r.evidence), 0)
+        self.assertEqual(r.provider, "openrouter")
+        self.assertEqual(r.generation, "model")
+
+    def test_retrieval_and_evidence_with_ollama(self):
+        r = answer_query("elevation units", DOCS, self.OllamaLike())
+        self.assertEqual(r.status, "ok")
+        self.assertEqual(r.answer, "grounded ollama answer")
+        self.assertGreater(len(r.evidence), 0)
+        self.assertEqual(r.provider, "ollama")
+
+    def test_response_never_exposes_api_key(self):
+        secret = "sk-or-test-secret-12345"
+        os.environ["MARS_OPENROUTER_API_KEY"] = secret
+        os.environ["MARS_AI_PROVIDER"] = "openrouter"
+        os.environ["MARS_OPENROUTER_MODEL"] = "openai/gpt-4o-mini"
+        from app.core.config import get_settings
+        get_settings.cache_clear()
+        err = urllib.error.HTTPError(provider_complete_url(), 401, "Unauthorized", {}, io.BytesIO(b""))
+        with patch("urllib.request.urlopen", side_effect=err):
+            r = answer_query("hi", DOCS, get_provider())
+        payload = json.dumps({
+            "status": r.status, "answer": r.answer, "notes": r.notes,
+            "provider_error": r.provider_error,
+        })
+        self.assertNotIn(secret, payload)
+        os.environ.pop("MARS_OPENROUTER_API_KEY", None)
+        get_settings.cache_clear()

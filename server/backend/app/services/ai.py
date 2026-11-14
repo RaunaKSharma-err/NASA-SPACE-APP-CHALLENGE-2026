@@ -41,26 +41,55 @@ class Evidence:
 
 
 class ProviderUnavailable(RuntimeError):
-    pass
+    """Raised when the configured AI provider cannot generate a response."""
+
+    def __init__(self, message: str, *, sanitized: bool = True):
+        super().__init__(message)
+        self.sanitized = sanitized
 
 
 class AIProvider(Protocol):
+    provider_id: str
+    provider_label: str
+    provider_mode: str  # "online" | "offline" | "none"
+    model: str | None
+
     def complete(self, prompt: str) -> str: ...
 
 
+@dataclass(frozen=True)
+class ProviderStatus:
+    provider: str
+    provider_label: str
+    provider_mode: str  # "online" | "offline" | "none"
+    model: str | None
+    available: bool
+    configured: bool
+    reason: str | None = None
+
+
 class NullProvider:
-    """Default: no provider configured. Credentials for real providers stay server-side."""
+    """Unconfigured/unavailable provider. Never used as silent fallback."""
+
+    provider_id = "none"
+    provider_label = "AI Provider Unavailable"
+    provider_mode = "none"
+    model = None
+
+    def __init__(self, reason: str = "No AI provider is configured", configured: bool = False):
+        self.reason = reason
+        self.configured = configured
 
     def complete(self, prompt: str) -> str:
-        raise ProviderUnavailable("No AI provider is configured")
+        raise ProviderUnavailable(self.reason)
 
 
 class OllamaProvider:
-    """Local inference via Ollama. Default provider for offline operation.
+    """Local inference via Ollama. Default provider for offline operation."""
 
-    Uses qwen2.5:0.5b by default — small enough for 6 GB RAM machines.
-    """
-
+    provider_id = "ollama"
+    provider_label = "Ollama · Local AI"
+    provider_mode = "offline"
     _lock = threading.Lock()
 
     def __init__(self, base_url: str, model: str, timeout: int = 60):
@@ -83,27 +112,46 @@ class OllamaProvider:
             try:
                 with urllib.request.urlopen(req, timeout=self.timeout) as resp:
                     data = json.loads(resp.read().decode("utf-8"))
-            except (urllib.error.URLError, TimeoutError, OSError) as exc:
-                raise ProviderUnavailable(f"Ollama unavailable: {exc}") from exc
-            except json.JSONDecodeError as exc:
-                raise ProviderUnavailable(f"Ollama returned invalid JSON: {exc}") from exc
-        text = data.get("response", "").strip()
+            except TimeoutError as exc:
+                raise ProviderUnavailable("Ollama request timed out") from exc
+            except urllib.error.HTTPError as exc:
+                raise ProviderUnavailable(f"Ollama returned HTTP {exc.code}") from exc
+            except urllib.error.URLError:
+                raise ProviderUnavailable("Ollama is unavailable at the configured URL") from None
+            except (OSError, ValueError, json.JSONDecodeError):
+                raise ProviderUnavailable("Ollama returned an invalid response") from None
+        text = (data.get("response") or "").strip() if isinstance(data, dict) else ""
         if not text:
             raise ProviderUnavailable("Ollama returned an empty response")
         return text
 
 
 class OpenRouterProvider:
-    """Optional cloud provider. Only enabled when an API key is explicitly configured."""
+    """Cloud inference via OpenRouter. Backend-only; API key never exposed."""
 
-    def __init__(self, api_key: str, model: str, timeout: int = 30):
+    provider_id = "openrouter"
+    provider_label = "OpenRouter · Online AI"
+    provider_mode = "online"
+
+    def __init__(
+        self,
+        api_key: str,
+        model: str,
+        timeout: int = 30,
+        site_url: str = "",
+        app_name: str = "MARSYN",
+    ):
         self.api_key = api_key
         self.model = model
         self.timeout = timeout
+        self.site_url = (site_url or "").strip()
+        self.app_name = (app_name or "MARSYN").strip()
 
     def complete(self, prompt: str) -> str:
         if not self.api_key:
-            raise ProviderUnavailable("OpenRouter API key not configured")
+            raise ProviderUnavailable("OpenRouter API key is not configured")
+        if not self.model:
+            raise ProviderUnavailable("OpenRouter model is not configured")
         url = "https://openrouter.ai/api/v1/chat/completions"
         payload = json.dumps({
             "model": self.model,
@@ -111,26 +159,38 @@ class OpenRouterProvider:
             "max_tokens": 320,
             "temperature": 0.2,
         }).encode("utf-8")
-        req = urllib.request.Request(
-            url,
-            data=payload,
-            headers={
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {self.api_key}",
-            },
-            method="POST",
-        )
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {self.api_key}",
+        }
+        if self.site_url:
+            headers["HTTP-Referer"] = self.site_url
+        if self.app_name:
+            headers["X-Title"] = self.app_name
+        req = urllib.request.Request(url, data=payload, headers=headers, method="POST")
         try:
             with urllib.request.urlopen(req, timeout=self.timeout) as resp:
                 data = json.loads(resp.read().decode("utf-8"))
-        except (urllib.error.URLError, TimeoutError, OSError) as exc:
-            raise ProviderUnavailable(f"OpenRouter unavailable: {exc}") from exc
-        except json.JSONDecodeError as exc:
-            raise ProviderUnavailable(f"OpenRouter returned invalid JSON: {exc}") from exc
-        choices = data.get("choices", [])
-        if not choices:
+        except TimeoutError as exc:
+            raise ProviderUnavailable("OpenRouter request timed out") from exc
+        except urllib.error.HTTPError as exc:
+            if exc.code in (401, 403):
+                raise ProviderUnavailable("OpenRouter authentication failed") from exc
+            if exc.code == 429:
+                raise ProviderUnavailable("OpenRouter rate limit exceeded") from exc
+            if 500 <= exc.code <= 599:
+                raise ProviderUnavailable("OpenRouter service error") from exc
+            raise ProviderUnavailable(f"OpenRouter request failed (HTTP {exc.code})") from exc
+        except urllib.error.URLError:
+            raise ProviderUnavailable("OpenRouter is unavailable due to a network error") from None
+        except (OSError, ValueError, json.JSONDecodeError):
+            raise ProviderUnavailable("OpenRouter returned an invalid response") from None
+        choices = data.get("choices") if isinstance(data, dict) else None
+        if not isinstance(choices, list) or not choices:
             raise ProviderUnavailable("OpenRouter returned no choices")
-        text = choices[0].get("message", {}).get("content", "").strip()
+        msg = choices[0].get("message") if isinstance(choices[0], dict) else None
+        content = msg.get("content") if isinstance(msg, dict) else None
+        text = (content or "").strip() if isinstance(content, str) else ""
         if not text:
             raise ProviderUnavailable("OpenRouter returned an empty response")
         return text
@@ -142,6 +202,12 @@ class AssistantResult:
     answer: str | None
     evidence: list[Evidence] = field(default_factory=list)
     notes: list[str] = field(default_factory=list)
+    provider: str | None = None
+    provider_label: str | None = None
+    provider_mode: str | None = None
+    model: str | None = None
+    generation: str | None = None  # "model" | "deterministic" | "fallback" | "none"
+    provider_error: str | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -951,12 +1017,32 @@ def _deterministic_marsyn_fact(key: str, docs: list[Document]) -> AssistantResul
 # Main entry point
 # ---------------------------------------------------------------------------
 
+def _provider_meta(provider: AIProvider) -> dict[str, str | None]:
+    return {
+        "provider": getattr(provider, "provider_id", None),
+        "provider_label": getattr(provider, "provider_label", None),
+        "provider_mode": getattr(provider, "provider_mode", None),
+        "model": getattr(provider, "model", None),
+    }
+
+
+def _with_provider_meta(result: AssistantResult, provider: AIProvider, generation: str, provider_error: str | None = None) -> AssistantResult:
+    meta = _provider_meta(provider)
+    result.provider = meta["provider"]
+    result.provider_label = meta["provider_label"]
+    result.provider_mode = meta["provider_mode"]
+    result.model = meta["model"]
+    result.generation = generation
+    result.provider_error = provider_error
+    return result
+
+
 def answer_query(query: str, docs: list[Document], provider: AIProvider) -> AssistantResult:
     intent = _classify_intent(query)
 
     logger.info(
         "assistant.query",
-        extra={"query": query, "intent": intent, "provider": type(provider).__name__},
+        extra={"query": query, "intent": intent, "provider": getattr(provider, "provider_id", type(provider).__name__)},
     )
 
     # ---- Path A: Conversational ----
@@ -964,14 +1050,20 @@ def answer_query(query: str, docs: list[Document], provider: AIProvider) -> Assi
         logger.info("assistant.path", extra={"path": "conversational", "retrieval_invoked": False})
         try:
             text = provider.complete(_build_conversational_prompt(query))
-        except ProviderUnavailable:
-            return AssistantResult(
-                "provider_unavailable", None, [],
-                ["Conversational response requested but no AI provider is configured."],
+        except ProviderUnavailable as exc:
+            return _with_provider_meta(
+                AssistantResult(
+                    "provider_unavailable", None, [],
+                    [str(exc) or "Configured AI provider is unavailable."],
+                ),
+                provider, "none", provider_error=str(exc) or "Configured AI provider is unavailable.",
             )
-        return AssistantResult(
-            "ok", text, [],
-            ["Conversational response — no retrieval.", "LLM provider used."],
+        return _with_provider_meta(
+            AssistantResult(
+                "ok", text, [],
+                ["Conversational response — no retrieval.", "LLM provider used."],
+            ),
+            provider, "model",
         )
 
     # ---- Path B: Retrieval-grounded / deterministic critical facts ----
@@ -980,51 +1072,93 @@ def answer_query(query: str, docs: list[Document], provider: AIProvider) -> Assi
     # 1) Deterministic project-fact answers (registry-backed, no LLM, no knowledge-doc mixing)
     project_fact = _marsyn_integration_question(query)
     if project_fact:
-        return _deterministic_marsyn_fact(project_fact, docs)
+        return _with_provider_meta(_deterministic_marsyn_fact(project_fact, docs), provider, "deterministic")
 
     # 2) Deterministic critical Mars constants and key science/location facts
     if _is_mars_diameter_question(query):
-        return _deterministic_mars_diameter(docs)
+        return _with_provider_meta(_deterministic_mars_diameter(docs), provider, "deterministic")
     if _is_mars_day_question(query):
-        return _deterministic_mars_day(docs)
+        return _with_provider_meta(_deterministic_mars_day(docs), provider, "deterministic")
     mola_key = _is_mola_question(query)
     if mola_key:
-        return _deterministic_mola_fact(mola_key, docs)
+        return _with_provider_meta(_deterministic_mola_fact(mola_key, docs), provider, "deterministic")
     gale_key = _is_gale_question(query)
     if gale_key:
-        return _deterministic_gale_fact(gale_key, docs)
+        return _with_provider_meta(_deterministic_gale_fact(gale_key, docs), provider, "deterministic")
 
     evidence = retrieve(query, docs)
 
     if not evidence:
-        return AssistantResult("no_evidence", None, [],
-                               ["No project data or knowledge documents matched this question."])
+        return _with_provider_meta(
+            AssistantResult("no_evidence", None, [],
+                            ["No project data or knowledge documents matched this question."]),
+            provider, "none",
+        )
 
     try:
         text = provider.complete(_build_grounded_prompt(query, evidence))
-    except ProviderUnavailable:
+    except ProviderUnavailable as exc:
         fallback = _evidence_fallback_answer(query, evidence)
-        return AssistantResult(
-            "ok", fallback, evidence,
-            ["AI provider unavailable — returned evidence-based fallback from retrieved documents."],
+        return _with_provider_meta(
+            AssistantResult(
+                "ok", fallback, evidence,
+                [f"AI provider unavailable — returned evidence-based fallback. ({str(exc)})"],
+            ),
+            provider, "fallback", provider_error=str(exc) or "Configured AI provider is unavailable.",
         )
 
     if _is_weak_answer(text):
         text = _evidence_fallback_answer(query, evidence)
         notes = ["Model output was insufficient; returned evidence-based fallback from retrieved documents."]
+        generation = "fallback"
     else:
         notes = ["Generated text grounded in retrieved evidence; verify critical values against sources."]
+        generation = "model"
 
-    return AssistantResult("ok", text, evidence, notes)
+    return _with_provider_meta(AssistantResult("ok", text, evidence, notes), provider, generation)
 
 
-def get_provider(name: str) -> AIProvider:
+def get_provider(name: str | None = None) -> AIProvider:
     s = get_settings()
-    name = (name or "").strip().lower()
-    if name == "ollama" or name == "local":
+    name = (name or s.ai_provider or "").strip().lower()
+    if name in ("ollama", "local"):
         return OllamaProvider(s.ollama_url, s.ollama_model, s.ollama_timeout)
     if name == "openrouter":
         if not s.openrouter_api_key:
-            return NullProvider()
-        return OpenRouterProvider(s.openrouter_api_key, s.openrouter_model, s.openrouter_timeout)
-    return NullProvider()
+            return NullProvider("OpenRouter API key is not configured", configured=True)
+        if not s.openrouter_model:
+            return NullProvider("OpenRouter model is not configured", configured=True)
+        return OpenRouterProvider(
+            s.openrouter_api_key,
+            s.openrouter_model,
+            s.openrouter_timeout,
+            site_url=getattr(s, "openrouter_site_url", ""),
+            app_name=getattr(s, "openrouter_app_name", "MARSYN"),
+        )
+    if name in ("none", "", "null", "disabled"):
+        return NullProvider("No AI provider is configured", configured=False)
+    return NullProvider(f"Unsupported AI provider: {name}", configured=False)
+
+
+def get_provider_status(name: str | None = None) -> ProviderStatus:
+    s = get_settings()
+    name = (name or s.ai_provider or "").strip().lower()
+    if name in ("ollama", "local"):
+        p = OllamaProvider(s.ollama_url, s.ollama_model, s.ollama_timeout)
+        return ProviderStatus(p.provider_id, p.provider_label, p.provider_mode, p.model, True, True, None)
+    if name == "openrouter":
+        if not s.openrouter_api_key:
+            return ProviderStatus("openrouter", "OpenRouter · Online AI", "online", s.openrouter_model or None, False, True, "OpenRouter API key is not configured")
+        if not s.openrouter_model:
+            return ProviderStatus("openrouter", "OpenRouter · Online AI", "online", None, False, True, "OpenRouter model is not configured")
+        p = OpenRouterProvider(
+            s.openrouter_api_key,
+            s.openrouter_model,
+            s.openrouter_timeout,
+            site_url=getattr(s, "openrouter_site_url", ""),
+            app_name=getattr(s, "openrouter_app_name", "MARSYN"),
+        )
+        return ProviderStatus(p.provider_id, p.provider_label, p.provider_mode, p.model, True, True, None)
+    if name in ("none", "", "null", "disabled"):
+        return ProviderStatus("none", "AI Provider Unavailable", "none", None, False, False, "No AI provider is configured")
+    return ProviderStatus("none", "AI Provider Unavailable", "none", None, False, False, f"Unsupported AI provider: {name}")

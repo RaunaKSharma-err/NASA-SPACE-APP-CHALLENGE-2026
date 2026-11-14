@@ -28,6 +28,22 @@ class AssistantResponse(BaseModel):
     answer: str | None
     evidence: list[EvidenceOut]
     notes: list[str]
+    provider: str | None = None
+    provider_label: str | None = None
+    provider_mode: Literal["online", "offline", "none"] | None = None
+    model: str | None = None
+    generation: Literal["model", "deterministic", "fallback", "none"] | None = None
+    provider_error: str | None = None
+
+
+class AssistantProviderStatus(BaseModel):
+    provider: str
+    provider_label: str
+    provider_mode: Literal["online", "offline", "none"]
+    model: str | None = None
+    available: bool
+    configured: bool
+    reason: str | None = None
 
 
 class OfflinePackage(BaseModel):

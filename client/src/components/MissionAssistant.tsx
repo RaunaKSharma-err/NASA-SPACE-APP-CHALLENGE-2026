@@ -2,7 +2,19 @@ import { useState, useRef, useEffect } from 'react';
 import { Bot, Send, AlertCircle, ExternalLink, Info } from 'lucide-react';
 import { useMissionStore } from '@/store/mission-store';
 import { apiClient } from '@/lib/api-client';
-import type { AssistantMessage } from '@/types';
+import type { AssistantMessage, AssistantProviderStatus } from '@/types';
+
+function defaultProviderStatus(): AssistantProviderStatus {
+  return {
+    provider: 'none',
+    providerLabel: 'AI Provider Unavailable',
+    providerMode: 'none',
+    model: null,
+    available: false,
+    configured: false,
+    reason: 'Checking provider status',
+  };
+}
 
 export function MissionAssistant() {
   const messages = useMissionStore((s) => s.assistantMessages);
@@ -15,7 +27,7 @@ export function MissionAssistant() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [input, setInput] = useState('');
-  const [providerMode, setProviderMode] = useState<'live' | 'mock' | 'checking'>('checking');
+  const [providerStatus, setProviderStatus] = useState<AssistantProviderStatus | null>(null);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -25,10 +37,12 @@ export function MissionAssistant() {
 
   useEffect(() => {
     let cancelled = false;
-    apiClient.checkProviderHealth().then((health) => {
+    apiClient.getAssistantProviderStatus().then((status) => {
       if (!cancelled) {
-        setProviderMode(health.localEnabled ? 'live' : 'mock');
+        setProviderStatus(status);
       }
+    }).catch(() => {
+      if (!cancelled) setProviderStatus(defaultProviderStatus());
     });
     return () => { cancelled = true; };
   }, []);
@@ -54,6 +68,17 @@ export function MissionAssistant() {
         activeLayers: layers.filter((l) => l.visible).map((l) => l.id),
       });
       addMessage(response);
+      if (response.provider !== 'mock') {
+        setProviderStatus((prev) => ({
+          provider: (response.provider as AssistantProviderStatus['provider']) || prev?.provider || 'none',
+          providerLabel: response.providerLabel || prev?.providerLabel || 'AI Provider Unavailable',
+          providerMode: (response.providerMode as AssistantProviderStatus['providerMode']) || prev?.providerMode || 'none',
+          model: response.model ?? prev?.model ?? null,
+          available: response.provider !== 'none',
+          configured: prev?.configured ?? true,
+          reason: response.providerError ?? prev?.reason ?? null,
+        }));
+      }
     } catch (err) {
       addMessage({
         id: `msg-${Date.now()}`,
@@ -78,6 +103,16 @@ export function MissionAssistant() {
     high: 'text-mission-critical bg-mission-critical/10',
   };
 
+  const activeStatus = providerStatus || defaultProviderStatus();
+  const statusBadgeClass = !providerStatus
+    ? 'bg-[#344252]/60 text-[#8D9CAF] animate-pulse'
+    : activeStatus.available
+      ? 'bg-mission-nominal/20 text-mission-nominal border border-mission-nominal/30'
+      : 'bg-mission-critical/20 text-mission-critical border border-mission-critical/30';
+  const statusBadgeText = !providerStatus
+    ? 'Checking provider…'
+    : activeStatus.providerLabel;
+
   const quickQueries = [
     'Find interesting targets within 5 km',
     'What are the terrain hazards here?',
@@ -89,19 +124,9 @@ export function MissionAssistant() {
       <div className="px-3 py-2.5 border-b border-[#344252]/40 flex items-center gap-2">
         <Bot className="text-accent-400" size={14} aria-hidden />
         <h3 className="section-title">Mission Assistant</h3>
-        {providerMode === 'checking' ? (
-          <span className="ml-auto text-[9px] px-1.5 py-0.5 rounded bg-[#344252]/60 text-[#8D9CAF] font-mono uppercase animate-pulse">
-            Checking provider…
-          </span>
-        ) : providerMode === 'live' ? (
-          <span className="ml-auto text-[9px] px-1.5 py-0.5 rounded bg-mission-nominal/20 text-mission-nominal border border-mission-nominal/30 font-mono uppercase">
-            Live LLM (Ollama)
-          </span>
-        ) : (
-          <span className="ml-auto text-[9px] px-1.5 py-0.5 rounded bg-mission-caution/20 text-mission-caution border border-mission-caution/30 font-mono uppercase" title="Backend unavailable — using local demo fixtures. Not a live AI response.">
-            Mock / Demo
-          </span>
-        )}
+        <span className={`ml-auto text-[9px] px-1.5 py-0.5 rounded border border-transparent font-mono uppercase ${statusBadgeClass}`}>
+          {statusBadgeText}
+        </span>
       </div>
 
       {/* Messages */}
@@ -144,10 +169,25 @@ export function MissionAssistant() {
                   <span className="text-[9px] text-[#8D9CAF] font-mono uppercase">Assistant</span>
                   {msg.provider === 'mock' && (
                     <span className="text-[8px] px-1.5 py-0.5 rounded bg-mission-caution/20 text-mission-caution border border-mission-caution/30 font-mono uppercase">
-                      Mock
+                      Mock / Demo
                     </span>
                   )}
-                  {msg.provider === 'unavailable' && (
+                  {msg.provider && msg.provider !== 'mock' && msg.provider !== 'none' && msg.generation === 'model' && (
+                    <span className="text-[8px] px-1.5 py-0.5 rounded bg-mission-nominal/15 text-mission-nominal border border-mission-nominal/30 font-mono uppercase">
+                      {msg.providerLabel || 'Model'}
+                    </span>
+                  )}
+                  {msg.generation === 'deterministic' && (
+                    <span className="text-[8px] px-1.5 py-0.5 rounded bg-accent-500/15 text-accent-300 border border-accent-500/30 font-mono uppercase">
+                      Deterministic
+                    </span>
+                  )}
+                  {msg.generation === 'fallback' && (
+                    <span className="text-[8px] px-1.5 py-0.5 rounded bg-mission-caution/15 text-mission-caution border border-mission-caution/30 font-mono uppercase">
+                      Evidence fallback
+                    </span>
+                  )}
+                  {msg.provider === 'none' && (
                     <span className="text-[8px] px-1.5 py-0.5 rounded bg-mission-critical/20 text-mission-critical border border-mission-critical/30 font-mono uppercase">
                       Provider unavailable
                     </span>
@@ -192,7 +232,9 @@ export function MissionAssistant() {
                   <span>
                     {msg.provider === 'mock'
                       ? 'Backend unreachable — showing demo fallback (not live AI)'
-                      : 'Service error — using fallback'}
+                      : msg.provider === 'none'
+                        ? (msg.providerError || 'AI provider unavailable')
+                        : (msg.providerError || 'Service error — using fallback')}
                   </span>
                 </div>
               )}
@@ -235,9 +277,13 @@ export function MissionAssistant() {
         </div>
         <p className="text-[9px] text-[#8D9CAF] mt-1.5 flex items-center gap-1">
           <ExternalLink size={9} aria-hidden />
-          {providerMode === 'live'
-            ? 'Live LLM via Ollama (qwen2.5:0.5b) — general knowledge may be imprecise; project answers are evidence-grounded'
-            : 'Backend unavailable — showing demo fixtures. Not a live AI response.'}
+          {!providerStatus
+            ? 'Checking configured AI provider…'
+            : activeStatus.provider === 'mock'
+              ? 'Backend unavailable — showing demo fixtures. Not a live AI response.'
+              : activeStatus.available
+                ? `${activeStatus.providerLabel}${activeStatus.model ? ` (${activeStatus.model})` : ''} — deterministic answers use project evidence; model answers may be imprecise.`
+                : `${activeStatus.providerLabel}${activeStatus.reason ? ` — ${activeStatus.reason}` : ''}`}
         </p>
       </form>
     </div>
